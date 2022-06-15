@@ -1,4 +1,4 @@
-package com.atguigu.gmall.common.constant;
+package cool.yunlong.mall.common.constant;
 
 /**
  * Redis常量配置类

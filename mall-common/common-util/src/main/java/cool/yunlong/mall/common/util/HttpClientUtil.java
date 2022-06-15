@@ -1,4 +1,4 @@
-package com.atguigu.gmall.common.util;
+package cool.yunlong.mall.common.util;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -77,9 +77,6 @@ public class HttpClientUtil {
             httpclient.close();
         }catch (IOException e){
             e.printStackTrace();
-            return  ;
         }
-
-        return   ;
     }
 }

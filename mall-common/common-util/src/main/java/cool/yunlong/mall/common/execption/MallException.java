@@ -4,11 +4,13 @@ import cool.yunlong.mall.common.result.ResultCodeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 自定义全局异常类
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "自定义全局异常类")
 public class MallException extends RuntimeException {
 
@@ -17,8 +19,9 @@ public class MallException extends RuntimeException {
 
     /**
      * 通过状态码和错误消息创建异常对象
-     * @param message
-     * @param code
+     *
+     * @param message 错误消息
+     * @param code    状态码
      */
     public MallException(String message, Integer code) {
         super(message);
@@ -26,8 +29,9 @@ public class MallException extends RuntimeException {
     }
 
     /**
-     * 接收枚举类型对象
-     * @param resultCodeEnum
+     * 通过状态码和错误消息创建异常对象
+     *
+     * @param resultCodeEnum 状态码枚举
      */
     public MallException(ResultCodeEnum resultCodeEnum) {
         super(resultCodeEnum.getMessage());
@@ -36,9 +40,6 @@ public class MallException extends RuntimeException {
 
     @Override
     public String toString() {
-        return "GuliException{" +
-                "code=" + code +
-                ", message=" + this.getMessage() +
-                '}';
+        return "MallException{" + "code=" + code + ", message=" + this.getMessage() + '}';
     }
 }

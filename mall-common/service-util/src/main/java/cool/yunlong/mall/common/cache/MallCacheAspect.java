@@ -1,9 +1,8 @@
-package com.atguigu.gmall.common.cache;
+package cool.yunlong.mall.common.cache;
 
 import com.alibaba.fastjson.JSON;
-import com.atguigu.gmall.common.constant.RedisConst;
+import cool.yunlong.mall.common.constant.RedisConst;
 import lombok.SneakyThrows;
-import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,6 +12,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Aspect
-public class GmallCacheAspect {
+public class MallCacheAspect {
 
     @Autowired
     private RedissonClient redissonClient;
@@ -32,7 +32,7 @@ public class GmallCacheAspect {
 
     //  定义一个环绕通知！
     @SneakyThrows
-    @Around("@annotation(com.atguigu.gmall.common.cache.GmallCache)")
+    @Around("@annotation(MallCache)")
     public Object gmallCacheAspectMethod(ProceedingJoinPoint point){
         //  定义一个对象
         Object obj = new Object();
@@ -48,7 +48,7 @@ public class GmallCacheAspect {
                 分布式锁业务逻辑！
          */
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
-        GmallCache gmallCache = methodSignature.getMethod().getAnnotation(GmallCache.class);
+        MallCache gmallCache = methodSignature.getMethod().getAnnotation(MallCache.class);
         //   获取到注解上的前缀
         String prefix = gmallCache.prefix();
         //  组成缓存的key！ 获取方法传递的参数

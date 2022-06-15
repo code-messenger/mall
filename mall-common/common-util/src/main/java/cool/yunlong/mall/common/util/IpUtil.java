@@ -1,4 +1,4 @@
-package com.atguigu.gmall.common.util;
+package cool.yunlong.mall.common.util;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;

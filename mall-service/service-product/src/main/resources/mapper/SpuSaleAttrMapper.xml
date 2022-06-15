@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cool.yunlong.mall.product.mapper.SpuSaleAttrMapper">
+
+    <resultMap id="baseSpuSaleAttrMap" type="cool.yunlong.mall.model.product.SpuSaleAttr" autoMapping="true">
+
+        <id property="id" column="id"/>
+        <!--一对多-->
+        <collection property="spuSaleAttrValueList" ofType="cool.yunlong.mall.model.product.SpuSaleAttrValue"
+                    autoMapping="true">
+            <id property="id" column="sale_attr_value_id"/>
+        </collection>
+
+    </resultMap>
+
+    <!-- 根据 spuId 查询 spu 销售属性列表 -->
+    <select id="selectSpuSaleAttrList" resultMap="baseSpuSaleAttrMap">
+        select ssa.id,
+               ssa.spu_id,
+               ssa.sale_attr_name,
+               ssa.base_sale_attr_id,
+               ssav.id sale_attr_value_id,
+               ssav.sale_attr_value_name
+        from spu_sale_attr ssa
+                 inner join spu_sale_attr_value ssav on ssa.spu_id = ssav.spu_id
+            and ssa.base_sale_attr_id = ssav.base_sale_attr_id
+        where ssa.spu_id = #{spuId}
+          and ssa.is_deleted = 0
+          and ssav.is_deleted = 0
+        order by ssa.base_sale_attr_id, ssav.id
+    </select>
+
+    <!-- 根据 spuId、skuId 查询销售属性列表 -->
+    <select id="selectSpuSaleAttrListCheckBySku" resultMap="baseSpuSaleAttrMap">
+        select ssa.id,
+               ssa.spu_id,
+               ssa.sale_attr_name,
+               ssa.base_sale_attr_id,
+               ssav.id as                  sale_attr_value_id,
+               ssav.sale_attr_value_name,
+               sv.sku_id,
+               if(sv.sku_id is null, 0, 1) is_checked
+        from spu_sale_attr ssa
+                 inner join spu_sale_attr_value ssav
+                            on ssa.spu_id = ssav.spu_id and ssa.base_sale_attr_id = ssav.base_sale_attr_id
+                 left join sku_sale_attr_value sv
+                           on sv.sale_attr_value_id = ssav.id and sku_id = #{skuId} and sv.is_deleted = 0
+        where ssa.spu_id = #{spuId}
+          and ssa.is_deleted = 0
+          and ssav.is_deleted = 0
+        order by ssav.base_sale_attr_id, ssav.id
+    </select>
+</mapper>

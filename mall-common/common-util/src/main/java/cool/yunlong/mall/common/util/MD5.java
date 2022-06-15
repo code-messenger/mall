@@ -1,4 +1,4 @@
-package com.atguigu.gmall.common.util;
+package cool.yunlong.mall.common.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
