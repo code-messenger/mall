@@ -14,10 +14,10 @@ import java.util.Map;
 @Mapper
 public interface SkuSaleAttrValueMapper extends BaseMapper<SkuSaleAttrValue> {
     /**
-     * 商品切换
+     * 根据spuId获取销售属性值列表
      *
      * @param spuId spu编号
-     * @return 商品切换
+     * @return 销售属性值列表
      */
     List<Map<Object, Object>> selectSaleAttrValuesBySpu(Long spuId);
 }

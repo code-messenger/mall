@@ -13,6 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 /**
+ * 前台商品详情接口
+ * <p>
+ * 负责商品详情页面的展示,提供给 web-all 调用
+ * <p>
+ * user --> web-all --> service-item --> service-product-client --> service-product
+ *
  * @author yunlong
  * @since 2022/6/14 17:53
  */
@@ -30,6 +36,5 @@ public class ItemController {
         Map<String, Object> result = itemService.getItemBySkuId(skuId);
         return Result.ok(result);
     }
-
 
 }

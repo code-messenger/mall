@@ -8,6 +8,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
+ * 远程调用其他微服务接口进行数据汇总，封装商品详情页面所需数据给 web-all 渲染页面
+ *
  * @author yunlong
  * @since 2022/6/14 17:22
  */

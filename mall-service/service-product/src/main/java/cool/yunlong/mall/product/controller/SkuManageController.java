@@ -62,7 +62,7 @@ public class SkuManageController {
     @Operation(summary = "根据skuId获取sku信息")
     @GetMapping("/getSkuInfo/{skuId}")
     public Result<SkuInfo> getSkuInfo(@PathVariable("skuId") Long skuId) {
-        SkuInfo skuInfo = skuManageService.getSkuInfo(skuId);
+        SkuInfo skuInfo = skuManageService.getAllSkuInfo(skuId);
         return Result.ok(skuInfo);
     }
 }

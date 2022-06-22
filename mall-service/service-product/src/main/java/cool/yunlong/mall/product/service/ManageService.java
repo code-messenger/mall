@@ -1,5 +1,6 @@
 package cool.yunlong.mall.product.service;
 
+import com.alibaba.fastjson.JSONObject;
 import cool.yunlong.mall.model.product.*;
 
 import java.util.List;
@@ -70,6 +71,11 @@ public interface ManageService {
      */
     BaseAttrInfo getBaseAttrInfo(Long attrId);
 
-
+    /**
+     * 获取所有分类信息
+     *
+     * @return 所有分类信息
+     */
+    List<JSONObject> getBaseCategoryList();
 }
 

@@ -3,6 +3,7 @@ package cool.yunlong.mall.product.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import cool.yunlong.mall.model.product.SpuSaleAttr;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,6 +21,13 @@ public interface SpuSaleAttrMapper extends BaseMapper<SpuSaleAttr> {
      */
     List<SpuSaleAttr> selectSpuSaleAttrList(Long spuId);
 
-    List<SpuSaleAttr> selectSpuSaleAttrListCheckBySku(Long skuId, Long spuId);
+    /**
+     * 根据  skuId、spuId 查询销售属性数据 + 锁定
+     *
+     * @param skuId
+     * @param spuId
+     * @return
+     */
+    List<SpuSaleAttr> selectSpuSaleAttrListCheckBySku(@Param("skuId") Long skuId, @Param("spuId") Long spuId);
 }
 

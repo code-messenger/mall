@@ -6,6 +6,7 @@
     <resultMap id="spuValueIdsMap" type="java.util.Map" autoMapping="true">
     </resultMap>
 
+    <!-- 根据spuId获取销售属性值列表 -->
     <select id="selectSaleAttrValuesBySpu" resultMap="spuValueIdsMap">
         select sku_id, group_concat(sale_attr_value_id order by base_sale_attr_id separator '|') value_ids
         from sku_sale_attr_value sav
@@ -13,6 +14,5 @@
                             on ssav.id = sav.sale_attr_value_id and sav.is_deleted = 0 and ssav.is_deleted = 0
         where sav.spu_id = #{spuId}
         group by sku_id
-
     </select>
 </mapper>

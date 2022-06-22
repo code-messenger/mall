@@ -38,6 +38,9 @@ public class SpuManageServiceImpl implements SpuManageService {
     @Autowired
     private SpuPosterMapper spuPosterMapper;
 
+    @Autowired
+    private SkuSaleAttrValueMapper skuSaleAttrValueMapper;
+
 
     /**
      * 分页查询 spu 列表
@@ -98,24 +101,22 @@ public class SpuManageServiceImpl implements SpuManageService {
         //  判断
         if (!CollectionUtils.isEmpty(spuSaleAttrList)) {
             //  循环遍历
-            for (SpuSaleAttr spuSaleAttr : spuSaleAttrList) {
-                //  需要将spuId 赋值
+            spuSaleAttrList.forEach(spuSaleAttr -> {
+                // 设置SpuId
                 spuSaleAttr.setSpuId(spuInfo.getId());
                 spuSaleAttrMapper.insert(spuSaleAttr);
-
-                //  再此获取销售属性值集合
+                // 添加Spu属性值
                 List<SpuSaleAttrValue> spuSaleAttrValueList = spuSaleAttr.getSpuSaleAttrValueList();
-                //  判断
                 if (!CollectionUtils.isEmpty(spuSaleAttrValueList)) {
-                    //  循环遍历
-                    for (SpuSaleAttrValue spuSaleAttrValue : spuSaleAttrValueList) {
-                        //   需要将spuId， sale_attr_name 赋值
+                    spuSaleAttrValueList.forEach(spuSaleAttrValue -> {
+                        // 设置SpuId
                         spuSaleAttrValue.setSpuId(spuInfo.getId());
+                        // 将spuSaleAttr放入
                         spuSaleAttrValue.setSaleAttrName(spuSaleAttr.getSaleAttrName());
                         spuSaleAttrValueMapper.insert(spuSaleAttrValue);
-                    }
+                    });
                 }
-            }
+            });
         }
 
         // 4. 保存 spu 商品海报信息
@@ -176,8 +177,8 @@ public class SpuManageServiceImpl implements SpuManageService {
      * @return spu的海报
      */
     @Override
-    public List<SpuPoster> findSpuPosterBySpuId(Long spuId) {
-
+    public List<SpuPoster> getSpuPosterBySpuId(Long spuId) {
+        // select * from spu_poster where spu_id = #{spuId} and is_delete = 0
         QueryWrapper<SpuPoster> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("spu_id", spuId);
         return spuPosterMapper.selectList(queryWrapper);
@@ -199,22 +200,22 @@ public class SpuManageServiceImpl implements SpuManageService {
         QueryWrapper<SpuSaleAttr> queryWrapper2 = new QueryWrapper<>();
         queryWrapper2.eq("spu_id", spuInfo.getId());
         spuSaleAttrMapper.delete(queryWrapper2);
-        // 4. 删除 spu 销售属性值信息
+        // 3. 删除 spu 销售属性值信息
         QueryWrapper<SpuSaleAttrValue> queryWrapper4 = new QueryWrapper<>();
         queryWrapper4.eq("spu_id", spuInfo.getId());
         spuSaleAttrValueMapper.delete(queryWrapper4);
 
-        // 5. 删除 spu 商品海报信息
+        // 4. 删除 spu 商品海报信息
         QueryWrapper<SpuPoster> queryWrapper3 = new QueryWrapper<>();
         queryWrapper3.eq("spu_id", spuInfo.getId());
         spuPosterMapper.delete(queryWrapper3);
-        // 6. 保存 spu 信息
+        // 5. 保存 spu 信息
         spuInfoMapper.updateById(spuInfo);
         saveList(spuInfo);
     }
 
     /**
-     * 根据spuId查询spu的销售属性信息
+     * 根据spuId查询spu的信息
      *
      * @param spuId spu编号
      * @return 销售属性信息
@@ -231,7 +232,7 @@ public class SpuManageServiceImpl implements SpuManageService {
         spuInfo.setSpuSaleAttrList(spuSaleAttrList);
 
         // 获取 spu 商品海报列表
-        List<SpuPoster> spuPosterList = findSpuPosterBySpuId(spuId);
+        List<SpuPoster> spuPosterList = getSpuPosterBySpuId(spuId);
         spuInfo.setSpuPosterList(spuPosterList);
         return spuInfo;
     }

@@ -53,10 +53,10 @@ public interface SkuManageService {
      * @param skuId sku编号
      * @return 商品详情信息
      */
-    SkuInfo getSkuInfo(Long skuId);
+    SkuInfo getAllSkuInfo(Long skuId);
 
     /**
-     * 根据三级分类id查询分类列表
+     * 根据三级分类id查询分类信息
      *
      * @param category3Id 三级分类id
      * @return 分类列表
@@ -81,10 +81,10 @@ public interface SkuManageService {
     List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId);
 
     /**
-     * 根据spuId查询sku的销售属性值列表
+     * 根据spuId查询sku的销售属性组合
      *
      * @param spuId spu编号
-     * @return 销售属性值列表
+     * @return 销售属性组合
      */
     Map<Object, Object> getSkuValueIdsMap(Long spuId);
 
@@ -102,4 +102,12 @@ public interface SkuManageService {
      * @param skuInfo sku信息
      */
     void updateSkuInfo(SkuInfo skuInfo);
+
+    /**
+     * 根据skuId查询sku的基本信息
+     *
+     * @param skuId
+     * @return
+     */
+    SkuInfo getBaseSkuInfo(Long skuId);
 }

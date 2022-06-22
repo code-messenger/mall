@@ -5,8 +5,8 @@ import java.lang.annotation.*;
 /**
  * @author atguigu-mqx
  */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})   // 当前注解的使用范围 在方法上使用！
+@Retention(RetentionPolicy.RUNTIME) // 当前注解的生命周期 当前这个注解在 .java .class 在Java虚拟机上
 @Inherited
 @Documented
 public @interface MallCache {

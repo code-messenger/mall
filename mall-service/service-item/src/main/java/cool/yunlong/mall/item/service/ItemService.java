@@ -15,5 +15,4 @@ public interface ItemService {
      */
     Map<String, Object> getItemBySkuId(Long skuId);
 
-
 }

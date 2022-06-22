@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Api("前台商品详情接口")
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/product/inner")
 public class ProductApiController {
 
     @Autowired
@@ -33,43 +33,43 @@ public class ProductApiController {
     private SpuManageService spuManageService;
 
     @Operation(summary = "根据skuId获取sku信息")
-    @GetMapping("/inner/getSkuInfo/{skuId}")
-    public SkuInfo getAttrValueList(@PathVariable("skuId") Long skuId) {
-        return skuManageService.getSkuInfo(skuId);
+    @GetMapping("/getSkuInfo/{skuId}")
+    public SkuInfo getSkuInfo(@PathVariable("skuId") Long skuId) {
+        return skuManageService.getBaseSkuInfo(skuId);
     }
 
-    @Operation(summary = "通过三级分类id查询分类信息")
-    @GetMapping("/inner/getCategoryView/{category3Id}")
+    @Operation(summary = "根据三级分类id查询分类信息")
+    @GetMapping("/getCategoryView/{category3Id}")
     public BaseCategoryView getCategoryView(@PathVariable("category3Id") Long category3Id) {
         return skuManageService.getCategoryView(category3Id);
     }
 
-    @Operation(summary = "根据skuId获取sku价格")
-    @GetMapping("/inner/getSkuPrice/{skuId}")
+    @Operation(summary = "根据skuId获取sku最新价格", description = "为了保证价格的一致性,这里需要再次查询sku的价格")
+    @GetMapping("/getSkuPrice/{skuId}")
     public BigDecimal getSkuPrice(@PathVariable Long skuId) {
         return skuManageService.getSkuPrice(skuId);
     }
 
     @Operation(summary = "根据skuId、spuId获取销售属性列表")
-    @GetMapping("/inner/getSpuSaleAttrListCheckBySku/{skuId}/{spuId}")
+    @GetMapping("/getSpuSaleAttrListCheckBySku/{skuId}/{spuId}")
     public List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(@PathVariable("skuId") Long skuId, @PathVariable("spuId") Long spuId) {
         return skuManageService.getSpuSaleAttrListCheckBySku(skuId, spuId);
     }
 
-    @Operation(summary = "根据spuId获取销售属性值列表")
-    @GetMapping("/inner/getSkuValueIdsMap/{spuId}")
+    @Operation(summary = "商品切换")
+    @GetMapping("/getSkuValueIdsMap/{spuId}")
     public Map<Object, Object> getSkuValueIdsMap(@PathVariable("spuId") Long spuId) {
         return skuManageService.getSkuValueIdsMap(spuId);
     }
 
     @Operation(summary = "获取商品海报")
-    @GetMapping("/inner/findSpuPosterBySpuId/{spuId}")
+    @GetMapping("/findSpuPosterBySpuId/{spuId}")
     public List<SpuPoster> findSpuPosterBySpuId(@PathVariable Long spuId) {
-        return spuManageService.findSpuPosterBySpuId(spuId);
+        return spuManageService.getSpuPosterBySpuId(spuId);
     }
 
     @Operation(summary = "获取sku平台属性列表")
-    @GetMapping("/inner/getAttrList/{skuId}")
+    @GetMapping("/getAttrList/{skuId}")
     public List<BaseAttrInfo> getAttrList(@PathVariable("skuId") Long skuId) {
         return skuManageService.getAttrList(skuId);
     }

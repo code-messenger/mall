@@ -71,7 +71,7 @@ public class SkuManageServiceImpl implements SkuManageService {
     }
 
     private void saveSkuList(SkuInfo skuInfo) {
-        // 1. 保存sku图片信息
+        // 保存Sku_image
         List<SkuImage> skuImageList = skuInfo.getSkuImageList();
         if (!CollectionUtils.isEmpty(skuImageList)) {
             skuImageList.forEach(skuImage -> {
@@ -79,22 +79,21 @@ public class SkuManageServiceImpl implements SkuManageService {
                 skuImageMapper.insert(skuImage);
             });
         }
-
-        // 2. 保存sku销售属性值
-        List<SkuSaleAttrValue> skuSaleAttrValueList = skuInfo.getSkuSaleAttrValueList();
-        if (!CollectionUtils.isEmpty(skuSaleAttrValueList)) {
-            skuSaleAttrValueList.forEach(skuSaleAttrValue -> {
-                skuSaleAttrValue.setSkuId(skuInfo.getId());
-                skuSaleAttrValueMapper.insert(skuSaleAttrValue);
-            });
-        }
-
-        // 3. 保存sku属性值
+        // 保存sku_attr_value
         List<SkuAttrValue> skuAttrValueList = skuInfo.getSkuAttrValueList();
         if (!CollectionUtils.isEmpty(skuAttrValueList)) {
             skuAttrValueList.forEach(skuAttrValue -> {
                 skuAttrValue.setSkuId(skuInfo.getId());
                 skuAttrValueMapper.insert(skuAttrValue);
+            });
+        }
+        // 保存sku_sale_attr_value
+        List<SkuSaleAttrValue> skuSaleAttrValueList = skuInfo.getSkuSaleAttrValueList();
+        if (!CollectionUtils.isEmpty(skuSaleAttrValueList)) {
+            skuSaleAttrValueList.forEach(skuSaleAttrValue -> {
+                skuSaleAttrValue.setSpuId(skuInfo.getSpuId());
+                skuSaleAttrValue.setSkuId(skuInfo.getId());
+                skuSaleAttrValueMapper.insert(skuSaleAttrValue);
             });
         }
     }
@@ -145,6 +144,18 @@ public class SkuManageServiceImpl implements SkuManageService {
     }
 
     /**
+     * 根据skuId查询sku的基本信息
+     *
+     * @param skuId sku编号
+     * @return sku信息
+     */
+    @Override
+    public SkuInfo getBaseSkuInfo(Long skuId) {
+        return getInfo(skuId);
+    }
+
+
+    /**
      * 商品上架
      *
      * @param skuId sku编号
@@ -177,14 +188,9 @@ public class SkuManageServiceImpl implements SkuManageService {
      * @return 商品详情信息
      */
     @Override
-    public SkuInfo getSkuInfo(Long skuId) {
-        // 查询skuInfo
-        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
-
-        // 查询sku图片信息
-        List<SkuImage> skuImageList = getSkuImageList(skuId);
-        // 设置sku图片信息
-        skuInfo.setSkuImageList(skuImageList);
+    public SkuInfo getAllSkuInfo(Long skuId) {
+        // 查询sku基本信息
+        SkuInfo skuInfo = getInfo(skuId);
 
         // 查询sku销售属性值信息
         List<SkuSaleAttrValue> skuSaleAttrValueList = getSkuSaleAttrValueList(skuId);
@@ -195,6 +201,18 @@ public class SkuManageServiceImpl implements SkuManageService {
         List<SkuAttrValue> skuAttrValueList = getSkuAttrValueList(skuId);
         // 设置sku属性值信息
         skuInfo.setSkuAttrValueList(skuAttrValueList);
+
+        return skuInfo;
+    }
+
+    private SkuInfo getInfo(Long skuId) {
+        // 查询skuInfo
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+
+        // 查询sku图片信息
+        List<SkuImage> skuImageList = getSkuImageList(skuId);
+        // 设置sku图片信息
+        skuInfo.setSkuImageList(skuImageList);
 
         return skuInfo;
     }
@@ -243,10 +261,14 @@ public class SkuManageServiceImpl implements SkuManageService {
         // 查询销售属性名称信息
         if (!CollectionUtils.isEmpty(skuSaleAttrValueList)) {
             skuSaleAttrValueList.forEach(skuSaleAttrValue -> {
-                // 查询saleAttrValueName
+                //查询销售属性值表
                 SpuSaleAttrValue spuSaleAttrValue = spuSaleAttrValueMapper.selectById(skuSaleAttrValue.getSaleAttrValueId());
+                //设置销售属性值名
                 skuSaleAttrValue.setSaleAttrValueName(spuSaleAttrValue.getSaleAttrValueName());
-                spuSaleAttrValue.setBaseSaleAttrId(spuSaleAttrValue.getBaseSaleAttrId());
+                //设置销售属性名
+                skuSaleAttrValue.setSaleAttrName(spuSaleAttrValue.getSaleAttrName());
+                //设置销售属性ID
+                skuSaleAttrValue.setBaseSaleAttrId(spuSaleAttrValue.getBaseSaleAttrId());
             });
         }
         return skuSaleAttrValueList;
@@ -265,13 +287,14 @@ public class SkuManageServiceImpl implements SkuManageService {
     }
 
     /**
-     * 根据三级分类id查询分类列表
+     * 根据三级分类id查询分类信息
      *
      * @param category3Id 三级分类id
      * @return 分类列表
      */
     @Override
     public BaseCategoryView getCategoryView(Long category3Id) {
+        // select * from base_category_view where category3_id = ?
         return baseCategoryViewMapper.selectById(category3Id);
     }
 
@@ -283,7 +306,10 @@ public class SkuManageServiceImpl implements SkuManageService {
      */
     @Override
     public BigDecimal getSkuPrice(Long skuId) {
-        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        // select price from sku_info where id = ?
+        QueryWrapper<SkuInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("price").eq("id", skuId);
+        SkuInfo skuInfo = skuInfoMapper.selectOne(queryWrapper);
         return skuInfo == null ? new BigDecimal(0) : skuInfo.getPrice();
     }
 
@@ -300,10 +326,10 @@ public class SkuManageServiceImpl implements SkuManageService {
     }
 
     /**
-     * 根据spuId查询sku的销售属性值列表
+     * 根据spuId查询sku的销售属性组合
      *
      * @param spuId spu编号
-     * @return 销售属性值列表
+     * @return 销售属性组合
      */
     @Override
     public Map<Object, Object> getSkuValueIdsMap(Long spuId) {
@@ -321,7 +347,7 @@ public class SkuManageServiceImpl implements SkuManageService {
     }
 
     /**
-     * 根据skuId查询平台属性列表
+     * 根据skuId获取规格参数 --> 平台属性数据
      *
      * @param skuId sku编号
      * @return 平台属性列表

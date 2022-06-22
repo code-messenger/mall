@@ -8,6 +8,8 @@
         <module>mall-model</module>
         <module>mall-service</module>
         <module>mall-gateway</module>
+        <module>service-client</module>
+        <module>mall-web</module>
     </modules>
 
     <parent>
@@ -30,7 +32,7 @@
         <mysql-connector-java.version>8.0.29</mysql-connector-java.version>
         <mybatis-plus-boot-starter.version>3.4.1</mybatis-plus-boot-starter.version>
         <lombok.version>1.18.24</lombok.version>
-        <fastjson.version>1.2.29</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <redisson.version>3.17.0</redisson.version>
         <pool2.version>2.11.1</pool2.version>
         <httpclient.version>4.5.13</httpclient.version>

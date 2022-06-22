@@ -58,7 +58,7 @@ public interface SpuManageService {
      * @param spuId spu编号
      * @return spu的海报
      */
-    List<SpuPoster> findSpuPosterBySpuId(Long spuId);
+    List<SpuPoster> getSpuPosterBySpuId(Long spuId);
 
     /**
      * 更新 spu
