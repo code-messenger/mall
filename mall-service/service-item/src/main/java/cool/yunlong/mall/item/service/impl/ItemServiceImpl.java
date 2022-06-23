@@ -1,9 +1,12 @@
 package cool.yunlong.mall.item.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import cool.yunlong.mall.common.constant.RedisConst;
 import cool.yunlong.mall.item.service.ItemService;
 import cool.yunlong.mall.model.product.*;
 import cool.yunlong.mall.product.client.ProductFeignClient;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,9 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private ProductFeignClient productFeignClient;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
 
     /**
      * 根据skuId查询商品详情信息
@@ -37,6 +43,15 @@ public class ItemServiceImpl implements ItemService {
     public Map<String, Object> getItemBySkuId(Long skuId) {
         // 定义返回结果
         Map<String, Object> result = new HashMap<>();
+
+        // 防止缓存穿透，查询布隆过滤器中是否存在
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(RedisConst.SKU_BLOOM_FILTER);
+
+//        if (!bloomFilter.contains(skuId)) {
+//            // 不存在直接返回 null
+//            return null;
+//        }
+
         // 调用 service-product-client 接口
         SkuInfo skuInfo = productFeignClient.getSkuInfo(skuId);
 

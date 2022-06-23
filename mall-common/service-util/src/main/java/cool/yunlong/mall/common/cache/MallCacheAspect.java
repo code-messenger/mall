@@ -33,7 +33,7 @@ public class MallCacheAspect {
     //  定义一个环绕通知！
     @SneakyThrows
     @Around("@annotation(MallCache)")
-    public Object gmallCacheAspectMethod(ProceedingJoinPoint point) {
+    public Object mallCacheAspectMethod(ProceedingJoinPoint point) {
         //  定义一个对象
         Object obj;
         /*
@@ -47,12 +47,13 @@ public class MallCacheAspect {
             false:
                 分布式锁业务逻辑！
          */
+        // 先获取缓存的前缀
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
-        MallCache gmallCache = methodSignature.getMethod().getAnnotation(MallCache.class);
+        MallCache mallCache = methodSignature.getMethod().getAnnotation(MallCache.class);
         //   获取到注解上的前缀
-        String prefix = gmallCache.prefix();
+        String prefix = mallCache.prefix();
         //  组成缓存的key！ 获取方法传递的参数
-        String key = prefix + Arrays.asList(point.getArgs()).toString();
+        String key = prefix + Arrays.asList(point.getArgs());
         try {
             //  可以通过这个key 获取缓存的数据
             obj = this.getRedisData(key, methodSignature);
@@ -60,13 +61,13 @@ public class MallCacheAspect {
                 //  分布式业务逻辑
                 //  设置分布式锁，进入数据库进行查询数据！
                 RLock lock = redissonClient.getLock(key + ":lock");
-                //  调用trylock方法
+                //  调用tryLock方法
                 boolean result = lock.tryLock(RedisConst.SKULOCK_EXPIRE_PX1, RedisConst.SKULOCK_EXPIRE_PX2, TimeUnit.SECONDS);
                 //  判断
                 if (result) {
                     try {
                         //  执行业务逻辑：直接从数据库获取数据
-                        //  这个注解 @GmallCache 有可能在 BaseCategoryView getCategoryName , List<SpuSaleAttr> getSpuSaleAttrListById ....
+                        //  这个注解 @MallCache 有可能在 BaseCategoryView getCategoryName , List<SpuSaleAttr> getSpuSaleAttrListById ....
                         obj = point.proceed(point.getArgs());
                         //  防止缓存穿透
                         if (obj == null) {
@@ -86,7 +87,7 @@ public class MallCacheAspect {
                     //  没有获取到
                     try {
                         Thread.sleep(100);
-                        return gmallCacheAspectMethod(point);
+                        return mallCacheAspectMethod(point);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -109,7 +110,7 @@ public class MallCacheAspect {
      * @return 数据
      */
     private Object getRedisData(String key, MethodSignature methodSignature) {
-        //  在向缓存存储数据的时候，将数据变为Json 字符串了！
+        //  在向缓存存储数据的时候，将数据变为 Json 字符串了！
         //  通过这个key 获取到缓存的value
         String strJson = (String) this.redisTemplate.opsForValue().get(key);
         //  判断

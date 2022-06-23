@@ -2,6 +2,9 @@ package cool.yunlong.mall.product.service.impl;
 
 import cool.yunlong.mall.product.service.TestService;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RReadWriteLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -16,6 +19,9 @@ public class TestServiceImpl implements TestService {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     /**
      * 1. 在缓存中设置一个 num 的 key, value 为 0
@@ -103,5 +109,59 @@ public class TestServiceImpl implements TestService {
         // 解锁
 //            redisTemplate.delete("lock");
         //       }
+    }
+
+    /**
+     * redisson做分布式锁
+     */
+    @Override
+    public void testRedisson() {
+        // 获取锁
+        RLock lock = redissonClient.getLock("lock");
+
+        // 上锁
+        lock.lock();
+
+        try {
+            // 业务逻辑
+            String num = redisTemplate.opsForValue().get("num");
+
+            if (StringUtils.isEmpty(num)) {
+                return;
+            }
+
+            int numValue = Integer.parseInt(num);
+
+            // 写入缓存
+            redisTemplate.opsForValue().set("num", String.valueOf(numValue));
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
+        } finally {
+            // 释放锁
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public String testReadLock() {
+        // 获取ReadWriteLock对象
+        RReadWriteLock rwLock = redissonClient.getReadWriteLock("anyRWLock");
+        // 上锁
+        rwLock.readLock().lock(10, TimeUnit.SECONDS);
+        // 读取数据
+        // 不主动释放锁，等它到了过期时间自己释放锁
+        return redisTemplate.opsForValue().get("msg");
+    }
+
+    @Override
+    public String testWriteLock() {
+        // 获取ReadWriteLock对象
+        RReadWriteLock rwLock = redissonClient.getReadWriteLock("anyRWLock");
+        // 上锁
+        rwLock.writeLock().lock(10, TimeUnit.SECONDS);
+        // 写入数据
+        redisTemplate.opsForValue().set("msg", UUID.randomUUID().toString());
+        // 不主动释放锁，等它到了过期时间自己释放锁
+        return "success";
     }
 }

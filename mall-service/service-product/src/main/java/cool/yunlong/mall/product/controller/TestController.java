@@ -18,7 +18,31 @@ public class TestController {
 
     @GetMapping("/testLock")
     public Result<String> testLock() {
-        testService.testLock();
+//        testService.testLock();
+        testService.testRedisson();
         return Result.ok("测试成功！");
     }
+
+    /**
+     * 读锁
+     *
+     * @return 提示信息
+     */
+    @GetMapping("/readLock")
+    public Result<String> testReadLock() {
+        String msg = testService.testReadLock();
+        return Result.ok(msg);
+    }
+
+    /**
+     * 写锁
+     *
+     * @return 提示信息
+     */
+    @GetMapping("/writeLock")
+    public Result<String> testWriteLock() {
+        String msg = testService.testWriteLock();
+        return Result.ok(msg);
+    }
+
 }

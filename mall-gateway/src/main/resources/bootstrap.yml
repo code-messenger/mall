@@ -11,5 +11,3 @@ spring:
         server-addr: http://192.168.9.21:8848
         prefix: ${spring.application.name}
         file-extension: yaml
-server:
-  port: 80

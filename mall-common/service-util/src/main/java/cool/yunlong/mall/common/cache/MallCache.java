@@ -15,4 +15,7 @@ public @interface MallCache {
     //  目的用这个前缀要想组成 缓存的key！
     String prefix() default "cache:";
 
+    // 表示后缀
+    String suffix() default ":info";
+
 }

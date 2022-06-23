@@ -44,6 +44,7 @@ public class RedissonConfig {
         if (StringUtils.isEmpty(host)) {
             throw new RuntimeException("host is  empty");
         }
+        // 单节点百万级别
         SingleServerConfig serverConfig = config.useSingleServer()
                 //redis://127.0.0.1:7181
                 .setAddress(ADDRESS_PREFIX + this.host + ":" + port)

@@ -3,6 +3,7 @@ package cool.yunlong.mall.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import cool.yunlong.mall.common.cache.MallCache;
 import cool.yunlong.mall.model.product.*;
 import cool.yunlong.mall.product.mapper.*;
 import cool.yunlong.mall.product.service.SpuManageService;
@@ -139,6 +140,7 @@ public class SpuManageServiceImpl implements SpuManageService {
      * @param spuId spu 编号
      * @return spu 图片列表
      */
+    @MallCache(prefix = "SpuImage:")
     @Override
     public List<SpuImage> getSpuImageList(Long spuId) {
         QueryWrapper<SpuImage> queryWrapper = new QueryWrapper<>();
@@ -176,6 +178,7 @@ public class SpuManageServiceImpl implements SpuManageService {
      * @param spuId spu编号
      * @return spu的海报
      */
+    @MallCache(prefix = "spuPoster:")
     @Override
     public List<SpuPoster> getSpuPosterBySpuId(Long spuId) {
         // select * from spu_poster where spu_id = #{spuId} and is_delete = 0

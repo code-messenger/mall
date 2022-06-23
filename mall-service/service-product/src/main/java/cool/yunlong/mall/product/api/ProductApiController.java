@@ -35,7 +35,7 @@ public class ProductApiController {
     @Operation(summary = "根据skuId获取sku信息")
     @GetMapping("/getSkuInfo/{skuId}")
     public SkuInfo getSkuInfo(@PathVariable("skuId") Long skuId) {
-        return skuManageService.getBaseSkuInfo(skuId);
+        return skuManageService.getSkuInfoRedis(skuId);
     }
 
     @Operation(summary = "根据三级分类id查询分类信息")

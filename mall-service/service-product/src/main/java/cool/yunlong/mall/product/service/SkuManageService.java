@@ -103,11 +103,5 @@ public interface SkuManageService {
      */
     void updateSkuInfo(SkuInfo skuInfo);
 
-    /**
-     * 根据skuId查询sku的基本信息
-     *
-     * @param skuId
-     * @return
-     */
-    SkuInfo getBaseSkuInfo(Long skuId);
+    SkuInfo getSkuInfoRedis(Long skuId);
 }
