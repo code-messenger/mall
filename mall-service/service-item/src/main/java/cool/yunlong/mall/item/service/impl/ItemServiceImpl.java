@@ -1,12 +1,9 @@
 package cool.yunlong.mall.item.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import cool.yunlong.mall.common.constant.RedisConst;
 import cool.yunlong.mall.item.service.ItemService;
 import cool.yunlong.mall.model.product.*;
 import cool.yunlong.mall.product.client.ProductFeignClient;
-import org.redisson.api.RBloomFilter;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,6 +12,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -29,8 +28,11 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private ProductFeignClient productFeignClient;
 
+//    @Autowired
+//    private RedissonClient redissonClient;
+
     @Autowired
-    private RedissonClient redissonClient;
+    private ThreadPoolExecutor threadPoolExecutor;
 
 
     /**
@@ -45,33 +47,67 @@ public class ItemServiceImpl implements ItemService {
         Map<String, Object> result = new HashMap<>();
 
         // 防止缓存穿透，查询布隆过滤器中是否存在
-        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(RedisConst.SKU_BLOOM_FILTER);
+//        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(RedisConst.SKU_BLOOM_FILTER);
 
 //        if (!bloomFilter.contains(skuId)) {
 //            // 不存在直接返回 null
 //            return null;
 //        }
+        // 创建一个对象
+        CompletableFuture<SkuInfo> skuInfoCompletableFuture = CompletableFuture.supplyAsync(() -> {
 
-        // 调用 service-product-client 接口
-        SkuInfo skuInfo = productFeignClient.getSkuInfo(skuId);
+            // 调用 service-product-client 接口
+            SkuInfo skuInfo = productFeignClient.getSkuInfo(skuId);
 
-        if (skuInfo != null) {
+            if (skuInfo == null) {
+                return null;
+
+            } else {
+                // 保存数据
+                result.put("skuInfo", skuInfo);
+
+                // 返回结果
+                return skuInfo;
+            }
+        }, threadPoolExecutor);
+
+        CompletableFuture<Void> categoryViewCompletableFuture = skuInfoCompletableFuture.thenAcceptAsync(skuInfo -> {
             // 获取分类数据
             BaseCategoryView categoryView = productFeignClient.getCategoryView(skuInfo.getCategory3Id());
+            // 保存数据
+            result.put("categoryView", categoryView);
+        }, threadPoolExecutor);
 
+        CompletableFuture<Void> priceCompletableFuture = CompletableFuture.runAsync(() -> {
+            // 获取sku的价格
+            BigDecimal skuPrice = productFeignClient.getSkuPrice(skuId);
+            // 保存数据
+            result.put("price", skuPrice);
+        }, threadPoolExecutor);
+
+        CompletableFuture<Void> spuSaleAttrListCompletableFuture = skuInfoCompletableFuture.thenAcceptAsync(skuInfo -> {
             // 获取销售属性 + 销售属性值
             List<SpuSaleAttr> spuSaleAttrListCheckBySku = productFeignClient.getSpuSaleAttrListCheckBySku(skuId, skuInfo.getSpuId());
+            // 保存数据
+            result.put("spuSaleAttrList", spuSaleAttrListCheckBySku);
+        }, threadPoolExecutor);
 
+        CompletableFuture<Void> valuesSkuJsonCompletableFuture = skuInfoCompletableFuture.thenAcceptAsync(skuInfo -> {
             // 获取销售属性组合
             Map<Object, Object> skuValueIdsMap = productFeignClient.getSkuValueIdsMap(skuInfo.getSpuId());
             String valueJson = JSON.toJSONString(skuValueIdsMap);
+            // 保存数据
+            result.put("valuesSkuJson", valueJson);
+        }, threadPoolExecutor);
 
-            // 获取sku的价格
-            BigDecimal skuPrice = productFeignClient.getSkuPrice(skuId);
-
+        CompletableFuture<Void> spuPosterListCompletableFuture = skuInfoCompletableFuture.thenAcceptAsync(skuInfo -> {
             // 获取spu海报数据
             List<SpuPoster> spuPosterList = productFeignClient.findSpuPosterBySpuId(skuInfo.getSpuId());
+            // 保存数据
+            result.put("spuPosterList", spuPosterList);
+        }, threadPoolExecutor);
 
+        CompletableFuture<Void> skuAttrListCompletableFuture = CompletableFuture.runAsync(() -> {
             // 获取sku规格参数
             List<BaseAttrInfo> attrList = productFeignClient.getAttrList(skuId);
             List<Map<String, String>> skuAttrList = attrList.stream().map((baseAttrInfo) -> {
@@ -80,18 +116,19 @@ public class ItemServiceImpl implements ItemService {
                 attrMap.put("attrValue", baseAttrInfo.getAttrValueList().get(0).getValueName());
                 return attrMap;
             }).collect(Collectors.toList());
-
-            // 封装返回结果
-            result.put("categoryView", categoryView);
-            result.put("spuSaleAttrList", spuSaleAttrListCheckBySku);
-            result.put("valuesSkuJson", valueJson);
-            result.put("price", skuPrice);
-            result.put("spuPosterList", spuPosterList);
+            // 保存数据
             result.put("skuAttrList", skuAttrList);
-            result.put("skuInfo", skuInfo);
-            return result;
-        }
-        return null;
+        }, threadPoolExecutor);
+
+        // 多任务组合
+        CompletableFuture.allOf(skuInfoCompletableFuture, categoryViewCompletableFuture,
+                        spuSaleAttrListCompletableFuture, valuesSkuJsonCompletableFuture,
+                        priceCompletableFuture, spuPosterListCompletableFuture,
+                        skuAttrListCompletableFuture)
+                .join();
+
+        // 返回数据
+        return result;
     }
 }
 
