@@ -31,19 +31,19 @@
 
                         <div th:each="category1,st: ${list}" th:class="${st.index == 0} ? 'item bo' : 'item'">
                             <h3>
-                                <a th:href="@{http://list.gmall.com/list.html?category1Id={category1Id}(category1Id=${category1.categoryId})}"
+                                <a th:href="@{http://list.mall.com/list.html?category1Id={category1Id}(category1Id=${category1.categoryId})}"
                                    th:text="${category1.categoryName}" target="_blank">手机、数码、充值</a>
                             </h3>
                             <div class="item-list clearfix">
                                 <div class="subitem">
                                     <dl class="fore" th:each="category2: ${category1.categoryChild}">
                                         <dt>
-                                            <a th:href="@{http://list.gmall.com/list.html?category2Id={category2Id}(category2Id=${category2.categoryId})}"
+                                            <a th:href="@{http://list.mall.com/list.html?category2Id={category2Id}(category2Id=${category2.categoryId})}"
                                                th:text="${category2.categoryName}" target="_blank">充值</a>
                                         </dt>
                                         <dd>
                                             <em th:each="category3: ${category2.categoryChild}">
-                                                <a th:href="@{http://list.gmall.com/list.html?category3Id={category3Id}(category3Id=${category3.categoryId})}"
+                                                <a th:href="@{http://list.mall.com/list.html?category3Id={category3Id}(category3Id=${category3.categoryId})}"
                                                    th:text="${category3.categoryName}" target="_blank">充值</a>
                                             </em>
                                         </dd>
@@ -64,7 +64,7 @@
                     <li class="f-item">团购</li>
                     <li class="f-item">有趣</li>
                     <li class="f-item">
-                        <a href="http://activity.gmall.com/seckill.html" target="_blank">秒杀</a>
+                        <a href="http://activity.mall.com/seckill.html" target="_blank">秒杀</a>
                     </li>
                 </ul>
             </div>

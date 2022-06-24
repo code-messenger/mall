@@ -135,7 +135,7 @@ public class ManageServiceImpl implements ManageService {
      * @return 所有分类信息
      */
     @Override
-    @MallCache(prefix = "categoryList")
+    @MallCache(prefix = "categoryList:")
     public List<JSONObject> getBaseCategoryList() {
         // 创建一个返回对象
         List<JSONObject> list = new ArrayList<>();
@@ -198,8 +198,6 @@ public class ManageServiceImpl implements ManageService {
             category1.put("categoryChild", category2Child);
             list.add(category1);
         }
-
-
         return list;
     }
 

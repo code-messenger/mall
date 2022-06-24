@@ -1,5 +1,7 @@
 package cool.yunlong.mall.product.client;
 
+import com.alibaba.fastjson.JSONObject;
+import cool.yunlong.mall.common.result.Result;
 import cool.yunlong.mall.model.product.*;
 import cool.yunlong.mall.product.client.impl.ProductDegradeFeignClient;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,4 +78,12 @@ public interface ProductFeignClient {
      */
     @GetMapping("/api/product/inner/getAttrList/{skuId}")
     List<BaseAttrInfo> getAttrList(@PathVariable("skuId") Long skuId);
+
+    /**
+     * 获取首页分类信息
+     *
+     * @return 分类信息
+     */
+    @GetMapping("/api/product/getBaseCategoryList")
+    Result<List<JSONObject>> getBaseCategoryList();
 }

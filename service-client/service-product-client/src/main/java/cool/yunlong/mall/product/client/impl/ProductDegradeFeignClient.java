@@ -1,5 +1,7 @@
 package cool.yunlong.mall.product.client.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import cool.yunlong.mall.common.result.Result;
 import cool.yunlong.mall.model.product.*;
 import cool.yunlong.mall.product.client.ProductFeignClient;
 import org.springframework.stereotype.Component;
@@ -77,6 +79,16 @@ public class ProductDegradeFeignClient implements ProductFeignClient {
      */
     @Override
     public List<BaseAttrInfo> getAttrList(Long skuId) {
+        return null;
+    }
+
+    /**
+     * 获取首页分类信息
+     *
+     * @return 分类信息
+     */
+    @Override
+    public Result<List<JSONObject>> getBaseCategoryList() {
         return null;
     }
 }
