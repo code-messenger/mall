@@ -91,4 +91,15 @@ public class ProductDegradeFeignClient implements ProductFeignClient {
     public Result<List<JSONObject>> getBaseCategoryList() {
         return null;
     }
+
+    /**
+     * 根据品牌 id 获取品牌数据
+     *
+     * @param tmId 品牌 id
+     * @return 品牌数据
+     */
+    @Override
+    public BaseTrademark getTrademark(Long tmId) {
+        return null;
+    }
 }

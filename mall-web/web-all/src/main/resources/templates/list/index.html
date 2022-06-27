@@ -48,7 +48,7 @@
                     <li class="f-item">闪购</li>
                     <li class="f-item">团购</li>
                     <li class="f-item">有趣</li>
-                    <li class="f-item"><a href="http://activity.gmall.com/seckill.html" target="_blank">秒杀</a></li>
+                    <li class="f-item"><a href="http://activity.mall.com/seckill.html" target="_blank">秒杀</a></li>
                 </ul>
             </div>
             <div class="yui3-u Right"></div>
@@ -151,7 +151,7 @@
                     <li class="yui3-u-1-5" th:each="goods: ${goodsList}">
                         <div class="list-wrap">
                             <div class="p-img">
-                                <a th:href="@{http://item.gmall.com/{id}.html(id=${goods.id})}" target="_blank"><img
+                                <a th:href="@{http://item.mall.com/{id}.html(id=${goods.id})}" target="_blank"><img
                                         th:src="${goods.defaultImg}"/></a>
                             </div>
                             <div class="price">
@@ -161,7 +161,7 @@
                                 </strong>
                             </div>
                             <div class="attr">
-                                <a th:href="@{http://item.gmall.com/{id}.html(id=${goods.id})}" target="_blank"
+                                <a th:href="@{http://item.mall.com/{id}.html(id=${goods.id})}" target="_blank"
                                    th:utext="${goods.title}">Apple苹果iPhone 6s (A1699)Apple苹果iPhone 6s
                                     (A1699)Apple苹果iPhone 6s (A1699)Apple苹果iPhone 6s (A1699)</a>
                             </div>

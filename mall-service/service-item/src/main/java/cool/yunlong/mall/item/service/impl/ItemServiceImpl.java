@@ -2,6 +2,7 @@ package cool.yunlong.mall.item.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import cool.yunlong.mall.item.service.ItemService;
+import cool.yunlong.mall.list.client.ListFeignClient;
 import cool.yunlong.mall.model.product.*;
 import cool.yunlong.mall.product.client.ProductFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;
+
+    @Qualifier("cool.yunlong.mall.list.client.ListFeignClient")
+    @Autowired
+    private ListFeignClient listFeignClient;
 
 
     /**
@@ -120,11 +125,15 @@ public class ItemServiceImpl implements ItemService {
             result.put("skuAttrList", skuAttrList);
         }, threadPoolExecutor);
 
+        // 调用热度排名方法
+        CompletableFuture<Void> incrHostCompletableFuture = CompletableFuture
+                .runAsync(() -> listFeignClient.incrHotScore(skuId), threadPoolExecutor);
+
         // 多任务组合
         CompletableFuture.allOf(skuInfoCompletableFuture, categoryViewCompletableFuture,
                         spuSaleAttrListCompletableFuture, valuesSkuJsonCompletableFuture,
                         priceCompletableFuture, spuPosterListCompletableFuture,
-                        skuAttrListCompletableFuture)
+                        skuAttrListCompletableFuture, incrHostCompletableFuture)
                 .join();
 
         // 返回数据

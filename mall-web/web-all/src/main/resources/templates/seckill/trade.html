@@ -284,7 +284,7 @@
                 seckill.submitOrder(this.order).then(response => {
 
                     if (response.data.code == 200) {
-                        window.location.href = 'http://payment.gmall.com/pay.html?orderId=' + response.data.data
+                        window.location.href = 'http://payment.mall.com/pay.html?orderId=' + response.data.data
                     } else {
                         alert(response.data.message)
                     }

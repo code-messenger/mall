@@ -1,6 +1,7 @@
 package cool.yunlong.mall.product.api;
 
 import cool.yunlong.mall.model.product.*;
+import cool.yunlong.mall.product.service.BaseTrademarkService;
 import cool.yunlong.mall.product.service.SkuManageService;
 import cool.yunlong.mall.product.service.SpuManageService;
 import io.swagger.annotations.Api;
@@ -31,6 +32,9 @@ public class ProductApiController {
 
     @Autowired
     private SpuManageService spuManageService;
+
+    @Autowired
+    private BaseTrademarkService baseTrademarkService;
 
     @Operation(summary = "根据skuId获取sku信息")
     @GetMapping("/getSkuInfo/{skuId}")
@@ -72,6 +76,12 @@ public class ProductApiController {
     @GetMapping("/getAttrList/{skuId}")
     public List<BaseAttrInfo> getAttrList(@PathVariable("skuId") Long skuId) {
         return skuManageService.getAttrList(skuId);
+    }
+
+    @Operation(summary = "获取品牌数据")
+    @GetMapping("/getTrademark/{tmId}")
+    public BaseTrademark getTrademark(@PathVariable Long tmId) {
+        return baseTrademarkService.getById(tmId);
     }
 }
 

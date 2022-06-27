@@ -15,6 +15,6 @@ public class SearchResponseAttrVo implements Serializable {
     //当前属性值的集合
     private List<String> attrValueList = new ArrayList<>();
     //属性名称
-    private String attrName;//网络制式，分类
+    private String attrName;    //网络制式，分类
 }
 

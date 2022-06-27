@@ -26,5 +26,4 @@ public class SearchParam {
     private Integer pageNo = 1;//分页信息
     private Integer pageSize = 3; // 每页默认显示的条数
 
-
 }
