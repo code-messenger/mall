@@ -1,0 +1,15 @@
+spring:
+    application:
+        name: service-cart
+    cloud:
+        nacos:
+            config:
+                file-extension: yaml
+                prefix: ${spring.application.name}
+                server-addr: 192.168.200.129:8848
+                shared-configs:
+                    -   data-id: common.yaml
+            discovery:
+                server-addr: 192.168.200.129:8848
+    profiles:
+        active: dev

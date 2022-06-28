@@ -67,6 +67,8 @@ public class AuthGlobalFilter implements GlobalFilter {
         // 判断用户访问的请求中是否携带 /auth/ ,如果携带了必须要经过登录才能放行，没有登录要给出提示信息
         // 获取缓存中的用户 id
         String userId = getUserId(request);
+        // 获取临时id
+        String userTempId = getUserTempId(request);
         // 校验IP地址
         if ("-1".equals(userId)) {
             return out(response, ResultCodeEnum.PERMISSION);
@@ -93,14 +95,37 @@ public class AuthGlobalFilter implements GlobalFilter {
                 }
             }
         }
-        if (!StringUtils.isEmpty(userId)) {
-            // 将用户id 放入请求头
-            request.mutate().header("userId", userId).build();
-            ServerWebExchange build = exchange.mutate().request(request).build();
-            return chain.filter(build);
+        if (!StringUtils.isEmpty(userId) || !StringUtils.isEmpty(userTempId)) {
+            if (!StringUtils.isEmpty(userId)) {
+                request.mutate().header("userId", userId).build();
+            }
+            if (!StringUtils.isEmpty(userTempId)) {
+                request.mutate().header("userTempId", userTempId).build();
+            }
+            //将现在的request 变成 exchange对象
+            return chain.filter(exchange.mutate().request(request).build());
         }
-        // 默认返回
         return chain.filter(exchange);
+    }
+
+    /**
+     * 获取当前未登录临时用户id
+     *
+     * @param request 请求对象
+     * @return 临时用户id
+     */
+    private String getUserTempId(ServerHttpRequest request) {
+        // 从header中获取
+        String userTempId = request.getHeaders().getFirst("userTempId");
+        if (StringUtils.isEmpty(userTempId)) {
+            // 从cookie中获取
+            HttpCookie httpCookie = request.getCookies().getFirst("userTempId");
+            if (!StringUtils.isEmpty(httpCookie)) {
+                userTempId = httpCookie.getValue();
+            }
+        }
+        // 返回临时id
+        return userTempId;
     }
 
     /**
