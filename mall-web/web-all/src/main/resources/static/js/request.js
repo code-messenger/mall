@@ -1,5 +1,5 @@
 var request = axios.create({
-    baseURL: 'http://api.gmall.com',
+    baseURL: 'http://api.mall.com',
     timeout: 100000
 });
 
@@ -25,7 +25,7 @@ request.interceptors.response.use(function (response) {
     console.log(JSON.stringify(response))
 
     if (response.data.code == 208) {
-        window.location.href = 'http://passport.gmall.com/login.html?originUrl=' + window.location.href
+        window.location.href = 'http://passport.mall.com/login.html?originUrl=' + window.location.href
     } else {
         // debugger
         if (response.data.code == 200) {

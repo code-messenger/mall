@@ -318,11 +318,11 @@ public class SearchServiceImpl implements SearchService {
         }
         if (!StringUtils.isEmpty(searchParam.getCategory2Id())) {
             // { query bool filter }
-            boolQuery.filter(QueryBuilders.termQuery("category2Id", searchParam.getCategory3Id()));
+            boolQuery.filter(QueryBuilders.termQuery("category2Id", searchParam.getCategory2Id()));
         }
         if (!StringUtils.isEmpty(searchParam.getCategory1Id())) {
             // { query bool filter }
-            boolQuery.filter(QueryBuilders.termQuery("category1Id", searchParam.getCategory3Id()));
+            boolQuery.filter(QueryBuilders.termQuery("category1Id", searchParam.getCategory1Id()));
         }
 
         // 按照品牌进行过滤

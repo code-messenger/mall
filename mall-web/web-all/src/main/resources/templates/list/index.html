@@ -88,13 +88,13 @@
                 <div class="fl key brand">品牌</div>
                 <div class="value logos">
                     <ul class="logo-list">
-                        <li th:each="trademark:${trademarkList}">
+                        <li th:each="trademark:${trademarkList}" style="height: 80px;margin: 5px">
                             <!--th:text="${trademark.tmName}"-->
-                            <a class="trademark" style="text-decoration: none;color: red"
+                            <a class="trademark" style="text-decoration: none;color: steelblue"
                                th:href="${urlParam}+'&trademark='+${trademark.tmId}+':'+${trademark.tmName}+'&order='+${searchParam.order}"
                                th:title="${trademark.tmName}">
-                                <img th:src="${trademark.tmLogoUrl}">
-                                <div th:text="${trademark.tmName}" style="display: none"></div>
+                                <img th:src="${trademark.tmLogoUrl}" style="height: 80px">
+                                <div th:text="${trademark.tmName}" style="display: none;font-size: 30px"></div>
                             </a>
                         </li>
                     </ul>
@@ -126,13 +126,13 @@
                         <li th:class="${orderMap.type == '1' ? 'active': ''}">
                             <a th:href="${urlParam}+'&order=1:'+${orderMap.sort == 'asc' ? 'desc' : 'asc'}">
                                 综合<span th:if="${orderMap.type == '1'}"
-                                        th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
+                                          th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
                             </a>
                         </li>
                         <li th:class="${orderMap.type == '2' ? 'active': ''}">
                             <a th:href="${urlParam}+'&order=2:'+${orderMap.sort == 'asc' ? 'desc' : 'asc'}">
                                 价格<span th:if="${orderMap.type == '2'}"
-                                        th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
+                                          th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
                             </a>
                         </li>
                         <li>
@@ -475,7 +475,8 @@
                     <em class="tab-text"></em>
                     <span class="tab-sub J-count hide">0</span>
                 </div>
-                <div onclick="cartPanelView.tabItemClick('history')" class="toolbar-tab tbar-tab-history" data="我的足迹"
+                <div onclick="cartPanelView.tabItemClick('history')" class="toolbar-tab tbar-tab-history"
+                     data="我的足迹"
                      tag="history">
                     <i class="tab-ico"></i>
                     <em class="tab-text"></em>

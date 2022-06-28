@@ -6,8 +6,8 @@ var hm = {
     default: {
         // log采集地址（需配置）
         // sendUrl: "http://47.93.148.192:7070/log.gif",
-        sendUrl: "https://gmall.goho.co/applog",
-        // sendUrl: "http://gmalllog.viphk.ngrok.org/applog",
+        sendUrl: "https://mall.goho.co/applog",
+        // sendUrl: "http://malllog.viphk.ngrok.org/applog",
 
         // 曝光埋点的自定义DOM元素class名称
         displayClass: "hm-display-statistics",
@@ -201,7 +201,7 @@ var hm = {
         setCookie: function (name, value, time) {
             var date = new Date()
             date.setTime(date.getTime() + time)
-            $.cookie(name, encodeURIComponent(value), {domain: 'gmall.com', expires: date, path: '/'})
+            $.cookie(name, encodeURIComponent(value), {domain: 'mall.com', expires: date, path: '/'})
         },
 
         getCookie: function (name) {
