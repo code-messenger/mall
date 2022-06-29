@@ -36,7 +36,7 @@ public class PassportApiController {
     }
 
     @Operation(summary = "退出登录")
-    @GetMapping("logout")
+    @GetMapping("/logout")
     public Result<Void> logout(HttpServletRequest request) {
 
         // 用户退出

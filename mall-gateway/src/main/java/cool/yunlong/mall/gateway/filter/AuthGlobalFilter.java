@@ -33,158 +33,189 @@ import java.util.List;
  */
 @Component
 public class AuthGlobalFilter implements GlobalFilter {
-
-    // 创建一个匹配格式对象
-    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
-
     @Value("${authUrls.url}")
-    private String authUrl;
+    private String authUrl; //  authUrl=trade.html,myOrder.html,list.html
+
+    //  声明一个匹配格式对象
+    private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     @Autowired
     private RedisTemplate redisTemplate;
 
-    /***
-     * 全局过滤器
-     * @param exchange  网络服务对象
-     * @param chain 过滤器链
-     * @return Mono
+
+    /**
+     * 用户在访问业务的时候，先走过滤器
+     *
+     * @param exchange 用户的web  请求与相应对象
+     * @param chain    过滤器链
+     * @return
      */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 获取当前请求对象
+        //  先获取到用户发送的请求
         ServerHttpRequest request = exchange.getRequest();
-        // 获取当前请求的 url
+        //  获取到当前的请求url ：/api/product/inner/getSkuInfo/24
         String path = request.getURI().getPath();
-
-        // 获取当前响应对象
-        ServerHttpResponse response = exchange.getResponse();
-
-        // 判断是否属于内部数据接口
+        //  判断是否属于内部数据接口
         if (antPathMatcher.match("/**/inner/**", path)) {
+            //  获取相应对象
+            ServerHttpResponse response = exchange.getResponse();
+            //  给信息提示
             return out(response, ResultCodeEnum.PERMISSION);
         }
 
-        // 判断用户访问的请求中是否携带 /auth/ ,如果携带了必须要经过登录才能放行，没有登录要给出提示信息
-        // 获取缓存中的用户 id
-        String userId = getUserId(request);
-        // 获取临时id
-        String userTempId = getUserTempId(request);
-        // 校验IP地址
+        //  判断用户访问的请求中 是否带有/auth/ 如果带有，则必须要登录，没有登录的情况下访问，需要给提示信息.
+        //  在缓存中获取用户Id
+        String userId = this.getUserId(request);
+        //  获取临时用户Id
+        String userTempId = this.getUserTempId(request);
+
+        //  判断  判断ip 地址是否相同，如果不相同则返回-1
         if ("-1".equals(userId)) {
+            //  获取相应对象
+            ServerHttpResponse response = exchange.getResponse();
+            //  给信息提示
             return out(response, ResultCodeEnum.PERMISSION);
         }
 
+        //  判断 在订单的时候，才会编写这样的请求地址。
         if (antPathMatcher.match("/api/**/auth/**", path)) {
-            // 判断当前是否登录
+            //  判断当前是否登录
             if (StringUtils.isEmpty(userId)) {
+                //  获取相应对象
+                ServerHttpResponse response = exchange.getResponse();
+                //  给信息提示
                 return out(response, ResultCodeEnum.LOGIN_AUTH);
             }
         }
 
-        // 判断是否包含需要登录的页面  trade.html, myOrder.html
+        //  authUrl=trade.html,myOrder.html,list.html
         String[] split = authUrl.split(",");
-        if (split.length > 0) {
+        if (split != null && split.length > 0) {
             for (String url : split) {
-                // 判断 path 中是否包含url
-                if (path.contains(url) && StringUtils.isEmpty(userId)) {
-                    // 重定向
+                //  判断path 中是否包含url
+                //  http://list.mall.com/list.html?category3Id=61 但是用户Id 为空 说明没有登录.  跳转到登录页面。
+                if (path.indexOf(url) != -1 && StringUtils.isEmpty(userId)) {
+                    //  获取到相应对象
+                    ServerHttpResponse response = exchange.getResponse();
+                    //  重定向到哪里？
                     response.setStatusCode(HttpStatus.SEE_OTHER);
+                    //  request.getURI() = http://list.mall.com/list.html?category3Id=61
+                    //  request.getURI().getPath() = list.html?category3Id=61
                     response.getHeaders().set(HttpHeaders.LOCATION, "http://passport.mall.com/login.html?originUrl=" + request.getURI());
-
+                    //  重定向到登录页面
                     return response.setComplete();
                 }
             }
         }
+        //  将用户Id 放入请求头，目的是让后台的微服务模块，直接通过请求头方式获取即可！
         if (!StringUtils.isEmpty(userId) || !StringUtils.isEmpty(userTempId)) {
+            //  特殊的存储方式
             if (!StringUtils.isEmpty(userId)) {
+                //  request.getHeaders().set("userId",userId); 设置失败;
+                //  设置完成之后，返回 Mono<Void> 对象
+                //  返回  ServerHttpRequest   当前 request 的类型 ServerHttpRequest
                 request.mutate().header("userId", userId).build();
             }
             if (!StringUtils.isEmpty(userTempId)) {
+                //  返回  ServerHttpRequest  userId1  当前 request 的类型 ServerHttpRequest
                 request.mutate().header("userTempId", userTempId).build();
             }
-            //将现在的request 变成 exchange对象
+            //  将 request --> exchange
             return chain.filter(exchange.mutate().request(request).build());
         }
+        //  默认返回，但是这个exchange 中没有添加任何的请求头数据.
         return chain.filter(exchange);
     }
 
     /**
-     * 获取当前未登录临时用户id
-     *
-     * @param request 请求对象
-     * @return 临时用户id
+     * 获取临时用户Id
+     * @param request
+     * @return
      */
     private String getUserTempId(ServerHttpRequest request) {
-        // 从header中获取
-        String userTempId = request.getHeaders().getFirst("userTempId");
-        if (StringUtils.isEmpty(userTempId)) {
-            // 从cookie中获取
+        //  定义一个临时用户Id
+        String userTempId = "";
+        //  两处 cookie  或  header 中！
+        List<String> stringList = request.getHeaders().get("userTempId");
+        if (!CollectionUtils.isEmpty(stringList)) {
+            userTempId = stringList.get(0);
+        } else {
+            //    从cookie 中获取数据
             HttpCookie httpCookie = request.getCookies().getFirst("userTempId");
-            if (!StringUtils.isEmpty(httpCookie)) {
+            if (httpCookie != null) {
                 userTempId = httpCookie.getValue();
             }
         }
-        // 返回临时id
+        //  返回临时用户Id
         return userTempId;
     }
 
     /**
      * 用户输出提示方法
-     *
-     * @param response       响应对象
-     * @param resultCodeEnum 响应状态值
-     * @return Mono
+     * @param response
+     * @param resultCodeEnum
+     * @return
      */
     private Mono<Void> out(ServerHttpResponse response, ResultCodeEnum resultCodeEnum) {
+        //  输出的内容都在 resultCodeEnum 这个对象中
         Result<Object> result = Result.build(null, resultCodeEnum);
-        String jsonString = JSON.toJSONString(result);
-        DataBuffer wrap = response.bufferFactory().wrap(jsonString.getBytes());
-        // 设置请求头
+        //  现在要输出的内容都在result 对象中
+        String printStr = JSON.toJSONString(result);
+        //  打印相当于用数据流写出去.
+        DataBuffer wrap = response.bufferFactory().wrap(printStr.getBytes());
+        //  设置请求头格式 java-web
         response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
-        // 响应数据
+        //  返回数据。
         return response.writeWith(Mono.just(wrap));
     }
 
     /**
-     * 获取缓存中的 userId
-     *
-     * @param request 请求域对象
-     * @return userId
+     * 获取用户Id
+     * @param request
+     * @return
      */
     private String getUserId(ServerHttpRequest request) {
-        // 用户 token
+        //  用户Id 存储在缓存中
         String token = "";
-        // 从 headers 或 cookie 中获取 token
+        //  token 存在cookie 或 请求头
         List<String> stringList = request.getHeaders().get("token");
-        // 判空
+        //  判断集合不为空
         if (!CollectionUtils.isEmpty(stringList)) {
+            //  存储数据的时候只放入了一个值，因此获取数据的时候下标是 0
             token = stringList.get(0);
         } else {
-            HttpCookie token1 = request.getCookies().getFirst("token");
-            if (token1 != null) {
-                token = token1.getValue();
+            //  从cookie 中获取 token --> 对应的存储数据只有一条
+            HttpCookie token2 = request.getCookies().getFirst("token");
+            if (token2 != null) {
+                token = token2.getValue();
             }
         }
 
+        //  从缓存中获取数据
         if (!StringUtils.isEmpty(token)) {
-            // 缓存key
-            String loginKey = "user:login:" + token;
-            // 获取数据
-            String userIdString = (String) redisTemplate.opsForValue().get(loginKey);
-            // 转换为json
-            JSONObject jsonObject = JSONObject.parseObject(userIdString);
+            //  组成缓存的key
+            String loginKey = "user:login:" + token;  // user:login:d798cc05-3516-48fe-9d2a-8b874fef8662
+            //  获取数据
+            Object jsonObj = this.redisTemplate.opsForValue().get(loginKey);
+            String strJson = JSON.toJSONString(jsonObj);
+            //  存储的数据类型进行转换
+            JSONObject jsonObject = JSONObject.parseObject(strJson);
             if (jsonObject != null) {
-
+                //  登录时从缓存中获取的ip 地址。
                 String ip = (String) jsonObject.get("ip");
-                // 校验 ip
+                //  ip 地址相等则返回用户Id
                 if (ip.equals(IpUtil.getGatwayIpAddress(request))) {
-                    return (String) jsonObject.get("userId");
+                    //  获取userId
+                    String userId = (String) jsonObject.get("userId");
+                    return userId;
                 } else {
+                    //  返回-1 ：表示非法登录
                     return "-1";
                 }
             }
         }
-        return null;
+        return "";
     }
 }
 
