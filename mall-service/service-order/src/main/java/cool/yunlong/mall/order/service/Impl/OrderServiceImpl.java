@@ -12,6 +12,8 @@ import cool.yunlong.mall.model.enums.ProcessStatus;
 import cool.yunlong.mall.model.order.OrderDetail;
 import cool.yunlong.mall.model.order.OrderInfo;
 import cool.yunlong.mall.model.user.UserAddress;
+import cool.yunlong.mall.mq.constant.MqConst;
+import cool.yunlong.mall.mq.service.RabbitService;
 import cool.yunlong.mall.order.mapper.OrderDetailMapper;
 import cool.yunlong.mall.order.mapper.OrderInfoMapper;
 import cool.yunlong.mall.order.service.OrderService;
@@ -49,6 +51,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+
+    @Autowired
+    private RabbitService rabbitService;
 
     @Override
     public Map<String, Object> getOrderItem(HttpServletRequest request) {
@@ -132,6 +138,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
             orderDetail.setOrderId(orderInfo.getId());
             orderDetailMapper.insert(orderDetail);
         }
+
+        //发送延迟队列，如果定时未支付，取消订单
+        rabbitService.sendDelayMsg(MqConst.EXCHANGE_DIRECT_ORDER_CANCEL, MqConst.ROUTING_ORDER_CANCEL, orderInfo.getId(), MqConst.DELAY_TIME);
         return orderInfo.getId();
     }
 
@@ -192,6 +201,32 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
         // 设置订单状态
         page.getRecords().forEach(orderInfo -> orderInfo.setOrderStatus(OrderStatus.getStatusNameByStatus(orderInfo.getOrderStatus())));
         return page;
+    }
+
+    /**
+     * 处理过期订单
+     *
+     * @param orderId 订单id
+     */
+    @Override
+    public void execExpiredOrder(Long orderId) {
+        // orderInfo
+        updateOrderStatus(orderId, ProcessStatus.CLOSED);
+    }
+
+    /**
+     * 根据订单id修改订单的状态
+     *
+     * @param orderId       订单id
+     * @param processStatus 订单状态
+     */
+    @Override
+    public void updateOrderStatus(Long orderId, ProcessStatus processStatus) {
+        OrderInfo orderInfo = new OrderInfo();
+        orderInfo.setId(orderId);
+        orderInfo.setProcessStatus(processStatus.name());
+        orderInfo.setOrderStatus(processStatus.getOrderStatus().name());
+        orderInfoMapper.updateById(orderInfo);
     }
 }
 

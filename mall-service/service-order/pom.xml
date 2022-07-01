@@ -36,5 +36,11 @@
             <artifactId>service-cart-client</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- rabbitmq -->
+        <dependency>
+            <groupId>cool.yunlong.mall</groupId>
+            <artifactId>rabbit-util</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

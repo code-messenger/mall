@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cool.yunlong.mall.common.cache.MallCache;
 import cool.yunlong.mall.common.constant.RedisConst;
 import cool.yunlong.mall.model.product.*;
+import cool.yunlong.mall.mq.constant.MqConst;
+import cool.yunlong.mall.mq.service.RabbitService;
 import cool.yunlong.mall.product.mapper.*;
 import cool.yunlong.mall.product.service.SkuManageService;
 import org.redisson.api.RBloomFilter;
@@ -61,6 +63,9 @@ public class SkuManageServiceImpl implements SkuManageService {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Autowired
+    private RabbitService rabbitService;
 
     /**
      * 保存sku信息
@@ -296,6 +301,9 @@ public class SkuManageServiceImpl implements SkuManageService {
         skuInfo.setId(skuId);
         skuInfo.setIsSale(1);
         skuInfoMapper.updateById(skuInfo);
+
+        // 发送商品上架消息
+        rabbitService.sendMsg(MqConst.EXCHANGE_DIRECT_GOODS, MqConst.ROUTING_GOODS_UPPER, skuId);
     }
 
     /**
@@ -309,6 +317,9 @@ public class SkuManageServiceImpl implements SkuManageService {
         skuInfo.setId(skuId);
         skuInfo.setIsSale(0);
         skuInfoMapper.updateById(skuInfo);
+
+        // 发送商品下架消息
+        rabbitService.sendMsg(MqConst.EXCHANGE_DIRECT_GOODS, MqConst.ROUTING_GOODS_LOWER, skuId);
     }
 
     /**

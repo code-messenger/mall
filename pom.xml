@@ -10,6 +10,7 @@
         <module>mall-gateway</module>
         <module>service-client</module>
         <module>mall-web</module>
+        <module>ware-manage</module>
     </modules>
 
     <parent>

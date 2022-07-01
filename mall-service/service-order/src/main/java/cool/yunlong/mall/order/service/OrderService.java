@@ -3,6 +3,7 @@ package cool.yunlong.mall.order.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import cool.yunlong.mall.model.enums.ProcessStatus;
 import cool.yunlong.mall.model.order.OrderInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,4 +73,19 @@ public interface OrderService extends IService<OrderInfo> {
      * @return 订单列表
      */
     IPage<OrderInfo> getPage(Page<OrderInfo> pageParam, String userId);
+
+    /**
+     * 处理过期订单
+     *
+     * @param orderId 订单id
+     */
+    void execExpiredOrder(Long orderId);
+
+    /**
+     * 根据订单Id 修改订单的状态
+     *
+     * @param orderId       订单id
+     * @param processStatus 订单状态
+     */
+    void updateOrderStatus(Long orderId, ProcessStatus processStatus);
 }

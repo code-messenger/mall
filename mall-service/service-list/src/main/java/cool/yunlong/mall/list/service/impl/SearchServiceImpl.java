@@ -54,7 +54,7 @@ public class SearchServiceImpl implements SearchService {
     private ProductFeignClient productFeignClient;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
