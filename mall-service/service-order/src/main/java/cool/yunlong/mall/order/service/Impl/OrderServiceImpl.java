@@ -1,31 +1,27 @@
 package cool.yunlong.mall.order.service.Impl;
 
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cool.yunlong.mall.cart.client.CartFeignClient;
-import cool.yunlong.mall.common.util.AuthContextHolder;
 import cool.yunlong.mall.common.util.HttpClientUtil;
-import cool.yunlong.mall.model.cart.CartInfo;
 import cool.yunlong.mall.model.enums.OrderStatus;
 import cool.yunlong.mall.model.enums.ProcessStatus;
 import cool.yunlong.mall.model.order.OrderDetail;
 import cool.yunlong.mall.model.order.OrderInfo;
-import cool.yunlong.mall.model.user.UserAddress;
 import cool.yunlong.mall.mq.constant.MqConst;
 import cool.yunlong.mall.mq.service.RabbitService;
 import cool.yunlong.mall.order.mapper.OrderDetailMapper;
 import cool.yunlong.mall.order.mapper.OrderInfoMapper;
 import cool.yunlong.mall.order.service.OrderService;
-import cool.yunlong.mall.user.client.UserFeignClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -34,14 +30,6 @@ import java.util.*;
  */
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> implements OrderService {
-
-    @Qualifier("cool.yunlong.mall.user.client.UserFeignClient")
-    @Autowired
-    private UserFeignClient userFeignClient;
-
-    @Qualifier("cartFeignDegradeClient")
-    @Autowired
-    private CartFeignClient cartFeignClient;
 
     @Autowired
     private OrderInfoMapper orderInfoMapper;
@@ -56,49 +44,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
     @Autowired
     private RabbitService rabbitService;
 
-    @Override
-    public Map<String, Object> getOrderItem(HttpServletRequest request) {
-        // 创建一个 map 对象用于存放返回的数据
-        Map<String, Object> result = new HashMap<>();
-
-        // 获取用户Id
-        String userId = AuthContextHolder.getUserId(request);
-
-        // 获取用户的收货地址
-        List<UserAddress> userAddressList = userFeignClient.findUserAddressList(userId);
-
-        // 获取购物清单
-        List<CartInfo> cartCheckedList = cartFeignClient.getCartCheckedList(userId);
-
-        // 创建一个集合来存储订单明细
-        ArrayList<OrderDetail> detailArrayList = new ArrayList<>();
-
-        // 设置订单明细
-        cartCheckedList.forEach(cartInfo -> {
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setSkuId(cartInfo.getSkuId());
-            orderDetail.setSkuName(cartInfo.getSkuName());
-            orderDetail.setImgUrl(cartInfo.getImgUrl());
-            orderDetail.setSkuNum(cartInfo.getSkuNum());
-            orderDetail.setOrderPrice(cartInfo.getSkuPrice());
-
-            // 添加到集合
-            detailArrayList.add(orderDetail);
-        });
-
-        // 计算总金额
-        OrderInfo orderInfo = new OrderInfo();
-        orderInfo.setOrderDetailList(detailArrayList);
-        orderInfo.sumTotalAmount();
-
-        // 获取交易流水号
-        result.put("tradeNo", getTradeNo(userId));
-        result.put("userAddressList", userAddressList);
-        result.put("detailArrayList", detailArrayList);
-        result.put("totalNum", detailArrayList.size());
-        result.put("totalAmount", orderInfo.getTotalAmount());
-        return result;
-    }
 
     /**
      * 保存订单
@@ -212,6 +157,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
     public void execExpiredOrder(Long orderId) {
         // orderInfo
         updateOrderStatus(orderId, ProcessStatus.CLOSED);
+        rabbitService.sendMsg(MqConst.EXCHANGE_DIRECT_PAYMENT_CLOSE, MqConst.ROUTING_PAYMENT_CLOSE, orderId);
     }
 
     /**
@@ -227,6 +173,168 @@ public class OrderServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo> im
         orderInfo.setProcessStatus(processStatus.name());
         orderInfo.setOrderStatus(processStatus.getOrderStatus().name());
         orderInfoMapper.updateById(orderInfo);
+    }
+
+    /**
+     * 根据订单id获取订单信息
+     *
+     * @param orderId 订单id
+     * @return 订单信息
+     */
+    @Override
+    public OrderInfo getOrderInfo(Long orderId) {
+        // 获取订单信息
+        OrderInfo orderInfo = orderInfoMapper.selectById(orderId);
+
+        if (orderInfo != null) {
+            // 获取订单明细信息
+            QueryWrapper<OrderDetail> wrapper = new QueryWrapper<>();
+            wrapper.eq("order_id", orderId);
+            List<OrderDetail> orderDetailList = orderDetailMapper.selectList(wrapper);
+            orderInfo.setOrderDetailList(orderDetailList);
+        }
+        return orderInfo;
+    }
+
+    @Override
+    public void sendOrderStatus(Long orderId) {
+        // 更新订单状态
+        updateOrderStatus(orderId, ProcessStatus.NOTIFIED_WARE);
+
+        String wareJson = initWareOrder(orderId);
+        // 发送通知，扣减库存
+        rabbitService.sendMsg(MqConst.EXCHANGE_DIRECT_WARE_STOCK, MqConst.ROUTING_WARE_STOCK, wareJson);
+    }
+
+    // 根据orderId 获取json 字符串
+    private String initWareOrder(Long orderId) {
+        // 通过orderId 获取orderInfo
+        OrderInfo orderInfo = getOrderInfo(orderId);
+
+        // 将orderInfo中部分数据转换为Map
+        Map map = initWareOrderToMap(orderInfo);
+
+        return JSON.toJSONString(map);
+    }
+
+    //  将orderInfo中部分数据转换为Map
+    public Map initWareOrderToMap(OrderInfo orderInfo) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("orderId", orderInfo.getId());
+        map.put("consignee", orderInfo.getConsignee());
+        map.put("consigneeTel", orderInfo.getConsigneeTel());
+        map.put("orderComment", orderInfo.getOrderComment());
+        map.put("orderBody", orderInfo.getTradeBody());
+        map.put("deliveryAddress", orderInfo.getDeliveryAddress());
+        map.put("paymentWay", "2");
+        map.put("wareId", orderInfo.getWareId());// 仓库Id ，减库存拆单时需要使用！
+    /*
+    details:[{skuId:101,skuNum:1,skuName:
+    ’小米手64G’},
+    {skuId:201,skuNum:1,skuName:’索尼耳机’}]
+     */
+        ArrayList<Map> mapArrayList = new ArrayList<>();
+        List<OrderDetail> orderDetailList = orderInfo.getOrderDetailList();
+        for (OrderDetail orderDetail : orderDetailList) {
+            HashMap<String, Object> orderDetailMap = new HashMap<>();
+            orderDetailMap.put("skuId", orderDetail.getSkuId());
+            orderDetailMap.put("skuNum", orderDetail.getSkuNum());
+            orderDetailMap.put("skuName", orderDetail.getSkuName());
+            mapArrayList.add(orderDetailMap);
+        }
+        map.put("details", mapArrayList);
+        return map;
+    }
+
+    /**
+     * 订单拆分
+     *
+     * @param orderId    订单id
+     * @param wareSkuMap 库存信息
+     * @return 拆分结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<OrderInfo> orderSplit(long orderId, String wareSkuMap) {
+        ArrayList<OrderInfo> orderInfoArrayList = new ArrayList<>();
+    /*
+    1.  先获取到原始订单 107
+    2.  将wareSkuMap 转换为我们能操作的对象 [{"wareId":"1","skuIds":["2","10"]},{"wareId":"2","skuIds":["3"]}]
+        方案一：class Param{
+                    private String wareId;
+                    private List<String> skuIds;
+                }
+        方案二：看做一个Map mpa.put("wareId",value); map.put("skuIds",value)
+
+    3.  创建一个新的子订单 108 109 。。。
+    4.  给子订单赋值
+    5.  保存子订单到数据库
+    6.  修改原始订单的状态
+    7.  测试
+     */
+        OrderInfo orderInfoOrigin = getOrderInfo(orderId);
+        List<Map> maps = JSON.parseArray(wareSkuMap, Map.class);
+        if (maps != null) {
+            for (Map map : maps) {
+                String wareId = (String) map.get("wareId");
+
+                List<String> skuIds = (List<String>) map.get("skuIds");
+
+                OrderInfo subOrderInfo = new OrderInfo();
+                // 属性拷贝
+                BeanUtils.copyProperties(orderInfoOrigin, subOrderInfo);
+                // 防止主键冲突
+                subOrderInfo.setId(null);
+                subOrderInfo.setParentOrderId(orderId);
+                // 赋值仓库Id
+                subOrderInfo.setWareId(wareId);
+
+                // 计算子订单的金额: 必须有订单明细
+                // 获取到子订单明细
+                // 声明一个集合来存储子订单明细
+                ArrayList<OrderDetail> orderDetails = new ArrayList<>();
+
+                List<OrderDetail> orderDetailList = orderInfoOrigin.getOrderDetailList();
+                // 表示主主订单明细中获取到子订单的明细
+                if (orderDetailList != null && orderDetailList.size() > 0) {
+                    for (OrderDetail orderDetail : orderDetailList) {
+                        // 获取子订单明细的商品Id
+                        for (String skuId : skuIds) {
+                            if (Long.parseLong(skuId) == orderDetail.getSkuId().longValue()) {
+                                // 将订单明细添加到集合
+                                orderDetails.add(orderDetail);
+                            }
+                        }
+                    }
+                }
+                subOrderInfo.setOrderDetailList(orderDetails);
+                // 计算总金额
+                subOrderInfo.sumTotalAmount();
+                // 保存子订单
+                saveOrderInfo(subOrderInfo);
+                // 将子订单添加到集合中！
+                orderInfoArrayList.add(subOrderInfo);
+            }
+        }
+        // 修改原始订单的状态
+        updateOrderStatus(orderId, ProcessStatus.SPLIT);
+        return orderInfoArrayList;
+    }
+
+    /**
+     * 更新过期订单
+     *
+     * @param orderId 订单id
+     * @param flag    更新标记
+     */
+    @Override
+    public void execExpiredOrder(Long orderId, String flag) {
+        // 调用方法 状态
+        updateOrderStatus(orderId, ProcessStatus.CLOSED);
+        if ("2".equals(flag)) {
+            // 发送消息队列，关闭支付宝的交易记录。
+            rabbitService.sendMsg(MqConst.EXCHANGE_DIRECT_PAYMENT_CLOSE, MqConst.ROUTING_PAYMENT_CLOSE, orderId);
+        }
     }
 }
 

@@ -12,12 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 public class FeignInterceptor implements RequestInterceptor {
 
     public void apply(RequestTemplate requestTemplate) {
-        //  微服务远程调用使用feign ，feign 传递数据的时候，没有。
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
-        //  添加header 数据
+
         requestTemplate.header("userTempId", request.getHeader("userTempId"));
         requestTemplate.header("userId", request.getHeader("userId"));
     }
-
 }

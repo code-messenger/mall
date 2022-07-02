@@ -1,11 +1,9 @@
 package cool.yunlong.mall.order.client.impl;
 
 import cool.yunlong.mall.common.result.Result;
+import cool.yunlong.mall.model.order.OrderInfo;
 import cool.yunlong.mall.order.client.OrderFeignClient;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @author yunlong
@@ -14,7 +12,18 @@ import java.util.Map;
 @Component
 public class OrderFeignDegradeClient implements OrderFeignClient {
     @Override
-    public Result<Map<String, Object>> trade(HttpServletRequest request) {
+    public Result trade() {
+        return null;
+    }
+
+    /**
+     * 根据订单id获取订单信息
+     *
+     * @param orderId 订单id
+     * @return 订单信息
+     */
+    @Override
+    public OrderInfo getOrderInfo(Long orderId) {
         return null;
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -23,9 +22,9 @@ public class OrderController {
     private OrderFeignClient orderFeignClient;
 
     @GetMapping("trade.html")
-    public String trade(Model model, HttpServletRequest request) {
+    public String trade(Model model) {
         // 远程调用订单服务
-        Result<Map<String, Object>> result = orderFeignClient.trade(request);
+        Result<Map> result = orderFeignClient.trade();
         model.addAllAttributes(result.getData());
         // 返回视图
         return "order/trade";

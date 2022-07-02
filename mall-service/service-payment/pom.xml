@@ -9,44 +9,30 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>service-order</artifactId>
+    <artifactId>service-payment</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
-        <!-- 商品详情服务 -->
         <dependency>
             <groupId>cool.yunlong.mall</groupId>
-            <artifactId>service-product-client</artifactId>
+            <artifactId>service-order-client</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!-- 用户服务 -->
         <dependency>
-            <groupId>cool.yunlong.mall</groupId>
-            <artifactId>service-user-client</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.31.12.ALL</version>
         </dependency>
-        <!-- 购物车服务 -->
-        <dependency>
-            <groupId>cool.yunlong.mall</groupId>
-            <artifactId>service-cart-client</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <!-- rabbitmq -->
+
         <dependency>
             <groupId>cool.yunlong.mall</groupId>
             <artifactId>rabbit-util</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!-- 支付服务 -->
-        <dependency>
-            <groupId>cool.yunlong.mall</groupId>
-            <artifactId>service-payment-client</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
+
 </project>

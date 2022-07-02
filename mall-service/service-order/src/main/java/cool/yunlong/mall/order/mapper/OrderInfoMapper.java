@@ -13,5 +13,5 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
-    IPage<OrderInfo> selectOrderPage(Page<OrderInfo> pageParam, @Param("userId") String userId);
+    IPage<OrderInfo> selectOrderPage(@Param("pageParam") Page<OrderInfo> pageParam, @Param("userId") String userId);
 }

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import cool.yunlong.mall.model.enums.ProcessStatus;
 import cool.yunlong.mall.model.order.OrderInfo;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,14 +14,6 @@ import java.util.Map;
  * @since 2022/6/28 22:37
  */
 public interface OrderService extends IService<OrderInfo> {
-
-    /**
-     * 获取订单明细
-     *
-     * @param request 请求域对象
-     * @return 订单明细
-     */
-    Map<String, Object> getOrderItem(HttpServletRequest request);
 
     /**
      * 保存订单
@@ -82,10 +74,49 @@ public interface OrderService extends IService<OrderInfo> {
     void execExpiredOrder(Long orderId);
 
     /**
+     * 更新过期订单
+     *
+     * @param orderId 订单id
+     * @param flag    更新标记
+     */
+    void execExpiredOrder(Long orderId, String flag);
+
+    /**
      * 根据订单Id 修改订单的状态
      *
      * @param orderId       订单id
      * @param processStatus 订单状态
      */
     void updateOrderStatus(Long orderId, ProcessStatus processStatus);
+
+    /**
+     * 根据订单id获取订单信息
+     *
+     * @param orderId 订单id
+     * @return 订单信息
+     */
+    OrderInfo getOrderInfo(Long orderId);
+
+    /**
+     * 发送消息给库存！
+     *
+     * @param orderId 订单id
+     */
+    void sendOrderStatus(Long orderId);
+
+    /**
+     * 将orderInfo变为map集合
+     *
+     * @param orderInfo 订单信息
+     */
+    Map initWareOrderToMap(OrderInfo orderInfo);
+
+    /**
+     * 订单拆分
+     *
+     * @param orderId    订单id
+     * @param wareSkuMap 库存信息
+     * @return 拆分结果
+     */
+    List<OrderInfo> orderSplit(long orderId, String wareSkuMap);
 }

@@ -1,12 +1,11 @@
 package cool.yunlong.mall.order.client;
 
 import cool.yunlong.mall.common.result.Result;
+import cool.yunlong.mall.model.order.OrderInfo;
 import cool.yunlong.mall.order.client.impl.OrderFeignDegradeClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * @author yunlong
@@ -16,5 +15,14 @@ import java.util.Map;
 public interface OrderFeignClient {
 
     @GetMapping("/api/order/auth/trade")
-    Result<Map<String, Object>> trade(HttpServletRequest request);
+    Result trade();
+
+    /**
+     * 根据订单id获取订单信息
+     *
+     * @param orderId 订单id
+     * @return 订单信息
+     */
+    @GetMapping("/api/order//inner/getOrderInfo/{orderId}")
+    OrderInfo getOrderInfo(@PathVariable Long orderId);
 }
