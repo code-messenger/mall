@@ -25,7 +25,7 @@ public class SkuManageController {
     @Operation(summary = "分页展示sku列表")
     @GetMapping("/list/{page}/{limit}")
     public Result<IPage<SkuInfo>> list(@PathVariable("page") Long page, @PathVariable("limit") Long limit,
-                                       SkuInfo skuInfo) {
+                                          SkuInfo skuInfo) {
         Page<SkuInfo> pageInfo = new Page<>(page, limit);
         IPage<SkuInfo> skuInfoIPage = skuManageService.getSkuInfoPage(pageInfo, skuInfo);
         return Result.ok(skuInfoIPage);

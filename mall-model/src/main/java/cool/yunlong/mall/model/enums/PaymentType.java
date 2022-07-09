@@ -2,13 +2,13 @@ package cool.yunlong.mall.model.enums;
 
 public enum PaymentType {
     ALIPAY("支付宝"),
-    WEIXIN("微信" );
+    WEIXIN("微信");
 
-    private String comment ;
+    private String comment;
 
 
-    PaymentType(String comment ){
-        this.comment=comment;
+    PaymentType(String comment) {
+        this.comment = comment;
     }
 
     public String getComment() {

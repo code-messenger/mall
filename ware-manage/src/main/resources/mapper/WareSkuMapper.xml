@@ -4,8 +4,8 @@
     <select id="selectWareSkuAll" resultMap="wareSkuMap">
         SELECT ws.id, ws.sku_id, warehouse_id, stock_name, stock, stock_locked, wi.name as warehouse_name
         FROM ware_sku ws
-        INNER JOIN ware_info wi
-        ON ws.warehouse_id = wi.id
+                 INNER JOIN ware_info wi
+                            ON ws.warehouse_id = wi.id
     </select>
     <resultMap id="wareSkuMap" type="cool.yunlong.mall.ware.bean.WareSku" autoMapping="true">
         <result property="id" column="id"/>
@@ -22,7 +22,7 @@
         select stock - IFNULL(stock_locked, 0) as available_stock
         from ware_sku
         where sku_id = #{skuId}
-        and warehouse_id = #{warehouseId} for
+          and warehouse_id = #{warehouseId} for
         update
     </select>
 
@@ -30,15 +30,15 @@
         UPDATE ware_sku
         SET stock_locked= IFNULL(stock_locked, 0) + #{stockLocked}
         WHERE sku_id = #{skuId}
-        and warehouse_id = #{warehouseId}
+          and warehouse_id = #{warehouseId}
     </update>
 
     <update id="deliveryStock" parameterType="cool.yunlong.mall.ware.bean.WareSku">
         UPDATE ware_sku
         SET stock_locked= stock_locked - #{stock},
-        stock= stock - #{stock}
+            stock= stock - #{stock}
         WHERE sku_id = #{skuId}
-        and warehouse_id = #{warehouseId}
+          and warehouse_id = #{warehouseId}
     </update>
 
 </mapper>

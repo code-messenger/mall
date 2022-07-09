@@ -8,17 +8,17 @@ public enum ProcessStatus {
     STOCK_EXCEPTION("库存异常", OrderStatus.PAID),
     DELEVERED("已发货", OrderStatus.DELEVERED),
     CLOSED("已关闭", OrderStatus.CLOSED),
-    COMMNET("已评价",OrderStatus.FINISHED) ,
-    FINISHED("已完结", OrderStatus.FINISHED) ,
+    COMMNET("已评价", OrderStatus.FINISHED),
+    FINISHED("已完结", OrderStatus.FINISHED),
     PAY_FAIL("支付失败", OrderStatus.UNPAID),
     SPLIT("订单已拆分", OrderStatus.SPLIT);
 
-    private String comment ;
+    private String comment;
     private OrderStatus orderStatus;
 
-    ProcessStatus(String comment, OrderStatus orderStatus){
-        this.comment=comment;
-        this.orderStatus=orderStatus;
+    ProcessStatus(String comment, OrderStatus orderStatus) {
+        this.comment = comment;
+        this.orderStatus = orderStatus;
     }
 
     public String getComment() {

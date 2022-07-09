@@ -28,8 +28,8 @@ public class CartController {
     @Operation(summary = "添加购物车", description = "根据skuId、skuNum添加购物车")
     @GetMapping("/addToCart/{skuId}/{skuNum}")
     public Result<Void> addToCart(@PathVariable("skuId") Long skuId,
-                                  @PathVariable("skuNum") Integer skuNum,
-                                  HttpServletRequest request) {
+                                     @PathVariable("skuNum") Integer skuNum,
+                                     HttpServletRequest request) {
         // 获取请求头中的 userId
         String userId = AuthContextHolder.getUserId(request);
         if (StringUtils.isEmpty(userId)) {
@@ -58,7 +58,7 @@ public class CartController {
     @Operation(summary = "删除购物车", description = "根据skuId删除购物车")
     @DeleteMapping("/deleteCart/{skuId}")
     public Result<Void> deleteCart(@PathVariable("skuId") Long skuId,
-                                   HttpServletRequest request) {
+                                      HttpServletRequest request) {
         // 获取请求头中的 userId
         String userId = AuthContextHolder.getUserId(request);
         if (StringUtils.isEmpty(userId)) {
@@ -74,8 +74,8 @@ public class CartController {
     @Operation(summary = "选中状态")
     @GetMapping("/checkCart/{skuId}/{isChecked}")
     public Result<Void> checkCart(@PathVariable Long skuId,
-                                  @PathVariable Integer isChecked,
-                                  HttpServletRequest request) {
+                                     @PathVariable Integer isChecked,
+                                     HttpServletRequest request) {
 
         String userId = AuthContextHolder.getUserId(request);
         //  判断

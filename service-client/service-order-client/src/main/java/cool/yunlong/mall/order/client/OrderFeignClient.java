@@ -6,6 +6,8 @@ import cool.yunlong.mall.order.client.impl.OrderFeignDegradeClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @author yunlong
@@ -25,4 +27,13 @@ public interface OrderFeignClient {
      */
     @GetMapping("/api/order//inner/getOrderInfo/{orderId}")
     OrderInfo getOrderInfo(@PathVariable Long orderId);
+
+    /**
+     * 提交秒杀订单
+     *
+     * @param orderInfo 订单信息
+     * @return 订单id
+     */
+    @PostMapping("/api/order/inner/seckill/submitOrder")
+    Long submitOrder(@RequestBody OrderInfo orderInfo);
 }

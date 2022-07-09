@@ -43,12 +43,13 @@ public class IpUtil {
                 }
             }
         } catch (Exception e) {
-            ipAddress="";
+            ipAddress = "";
         }
         // ipAddress = this.getRequest().getRemoteAddr();
 
         return ipAddress;
     }
+
     // 网关中获取Ip地址
     public static String getGatwayIpAddress(ServerHttpRequest request) {
         HttpHeaders headers = request.getHeaders();

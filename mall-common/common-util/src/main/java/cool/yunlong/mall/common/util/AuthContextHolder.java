@@ -23,7 +23,8 @@ public class AuthContextHolder {
 
     /**
      * 获取当前未登录临时用户id
-     * @param request   请求对象
+     *
+     * @param request 请求对象
      * @return 用户id
      */
     public static String getUserTempId(HttpServletRequest request) {

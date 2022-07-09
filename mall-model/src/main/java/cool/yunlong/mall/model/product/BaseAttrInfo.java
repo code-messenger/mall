@@ -13,30 +13,29 @@ import java.util.List;
  * <p>
  * BaseAttrInfo
  * </p>
- *
  */
 @Data
 @ApiModel(description = "平台属性")
 @TableName("base_attr_info")
 public class BaseAttrInfo extends BaseEntity {
-	
-	private static final long serialVersionUID = 1L;
-	
-	@ApiModelProperty(value = "属性名称")
-	@TableField("attr_name")
-	private String attrName;
 
-	@ApiModelProperty(value = "分类id")
-	@TableField("category_id")
-	private Long categoryId;
+    private static final long serialVersionUID = 1L;
 
-	@ApiModelProperty(value = "分类层级")
-	@TableField("category_level")
-	private Integer categoryLevel;
+    @ApiModelProperty(value = "属性名称")
+    @TableField("attr_name")
+    private String attrName;
 
-	//	平台属性值集合
-	@TableField(exist = false)
-	private List<BaseAttrValue> attrValueList;
+    @ApiModelProperty(value = "分类id")
+    @TableField("category_id")
+    private Long categoryId;
+
+    @ApiModelProperty(value = "分类层级")
+    @TableField("category_level")
+    private Integer categoryLevel;
+
+    //	平台属性值集合
+    @TableField(exist = false)
+    private List<BaseAttrValue> attrValueList;
 
 }
 

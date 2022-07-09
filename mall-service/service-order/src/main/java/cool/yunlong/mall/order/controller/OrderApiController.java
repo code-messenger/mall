@@ -234,5 +234,12 @@ public class OrderApiController {
         }
         return JSON.toJSONString(mapArrayList);
     }
+
+    @Operation(summary = "秒杀订单")
+    @PostMapping("/inner/seckill/submitOrder")
+    public Long submitOrder(@RequestBody OrderInfo orderInfo) {
+        return orderService.saveOrderInfo(orderInfo);
+    }
 }
+
 

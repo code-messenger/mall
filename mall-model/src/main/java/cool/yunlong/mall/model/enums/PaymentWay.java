@@ -2,13 +2,13 @@ package cool.yunlong.mall.model.enums;
 
 public enum PaymentWay {
     ONLINE("在线支付"),
-    OUTLINE("货到付款" );
+    OUTLINE("货到付款");
 
-    private String comment ;
+    private String comment;
 
 
-    PaymentWay(String comment ){
-        this.comment=comment;
+    PaymentWay(String comment) {
+        this.comment = comment;
     }
 
     public String getComment() {

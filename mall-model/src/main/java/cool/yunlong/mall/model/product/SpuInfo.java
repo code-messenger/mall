@@ -13,41 +13,40 @@ import java.util.List;
  * <p>
  * SpuInfo
  * </p>
- *
  */
 @Data
 @ApiModel(description = "SpuInfo")
 @TableName("spu_info")
 public class SpuInfo extends BaseEntity {
-	
-	private static final long serialVersionUID = 1L;
-	
-	@ApiModelProperty(value = "商品名称")
-	@TableField("spu_name")
-	private String spuName;
 
-	@ApiModelProperty(value = "商品描述(后台简述）")
-	@TableField("description")
-	private String description;
+    private static final long serialVersionUID = 1L;
 
-	@ApiModelProperty(value = "三级分类id")
-	@TableField("category3_id")
-	private Long category3Id;
+    @ApiModelProperty(value = "商品名称")
+    @TableField("spu_name")
+    private String spuName;
 
-	@ApiModelProperty(value = "品牌id")
-	@TableField("tm_id")
-	private Long tmId;
+    @ApiModelProperty(value = "商品描述(后台简述）")
+    @TableField("description")
+    private String description;
 
-	// 销售属性集合
-	@TableField(exist = false)
-	private List<SpuSaleAttr> spuSaleAttrList;
+    @ApiModelProperty(value = "三级分类id")
+    @TableField("category3_id")
+    private Long category3Id;
 
-	// 商品的图片集合
-	@TableField(exist = false)
-	private List<SpuImage> spuImageList;
+    @ApiModelProperty(value = "品牌id")
+    @TableField("tm_id")
+    private Long tmId;
 
-	// 商品的海报图片集合
-	@TableField(exist = false)
-	private List<SpuPoster> spuPosterList;
+    // 销售属性集合
+    @TableField(exist = false)
+    private List<SpuSaleAttr> spuSaleAttrList;
+
+    // 商品的图片集合
+    @TableField(exist = false)
+    private List<SpuImage> spuImageList;
+
+    // 商品的海报图片集合
+    @TableField(exist = false)
+    private List<SpuPoster> spuPosterList;
 }
 

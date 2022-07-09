@@ -12,7 +12,7 @@ import java.util.List;
 
 // Index = goods , Type = info  es 7.8.0 逐渐淡化type！  修改！
 @Data
-@Document(indexName = "goods" , shards = 3,replicas = 2)
+@Document(indexName = "goods", shards = 3, replicas = 2)
 public class Goods {
     // 商品Id skuId
     @Id
@@ -29,7 +29,7 @@ public class Goods {
     private Double price;
 
     //  @Field(type = FieldType.Date)   6.8.1
-    @Field(type = FieldType.Date,format = DateFormat.custom,pattern = "yyyy-MM-dd HH:mm:ss")
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime; // 新品
 
     @Field(type = FieldType.Long)

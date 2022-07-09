@@ -67,8 +67,8 @@ public class BaseManageController {
     @Operation(summary = "获取指定三级分类下的平台属性信息")
     @GetMapping("attrInfoList/{category1Id}/{category2Id}/{category3Id}")
     public Result<List<BaseAttrInfo>> attrInfoList(@PathVariable("category1Id") Long category1Id,
-                                                   @PathVariable("category2Id") Long category2Id,
-                                                   @PathVariable("category3Id") Long category3Id) {
+                                                      @PathVariable("category2Id") Long category2Id,
+                                                      @PathVariable("category3Id") Long category3Id) {
         List<BaseAttrInfo> baseAttrInfoList = manageService.getAttrInfoList(category1Id, category2Id, category3Id);
         return Result.ok(baseAttrInfoList);
     }

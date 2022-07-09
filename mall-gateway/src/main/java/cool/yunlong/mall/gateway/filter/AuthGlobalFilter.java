@@ -130,6 +130,7 @@ public class AuthGlobalFilter implements GlobalFilter {
 
     /**
      * 获取临时用户Id
+     *
      * @param request
      * @return
      */
@@ -153,6 +154,7 @@ public class AuthGlobalFilter implements GlobalFilter {
 
     /**
      * 用户输出提示方法
+     *
      * @param response
      * @param resultCodeEnum
      * @return
@@ -172,6 +174,7 @@ public class AuthGlobalFilter implements GlobalFilter {
 
     /**
      * 获取用户Id
+     *
      * @param request
      * @return
      */

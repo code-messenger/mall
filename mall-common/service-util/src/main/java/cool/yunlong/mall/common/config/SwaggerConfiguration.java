@@ -39,7 +39,7 @@ public class SwaggerConfiguration {
         pars.add(tokenPar.build());
 
         ParameterBuilder tmpPar = new ParameterBuilder();
-                tmpPar.name("userTempId")
+        tmpPar.name("userTempId")
                 .description("临时用户ID")
                 .defaultValue("1")
                 .modelRef(new ModelRef("string"))
@@ -63,7 +63,7 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public Docket adminApiConfig(){
+    public Docket adminApiConfig() {
 
         return new Docket(DocumentationType.OAS_30)
                 .groupName("adminApi")
@@ -75,7 +75,7 @@ public class SwaggerConfiguration {
 
     }
 
-    private ApiInfo webApiInfo(){
+    private ApiInfo webApiInfo() {
 
         return new ApiInfoBuilder()
                 .title("网站-API文档")
@@ -85,7 +85,7 @@ public class SwaggerConfiguration {
                 .build();
     }
 
-    private ApiInfo adminApiInfo(){
+    private ApiInfo adminApiInfo() {
 
         return new ApiInfoBuilder()
                 .title("后台管理系统-API文档")

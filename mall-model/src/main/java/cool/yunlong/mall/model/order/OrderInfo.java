@@ -68,12 +68,12 @@ public class OrderInfo extends BaseEntity {
 
     @ApiModelProperty(value = "创建时间")
     @TableField("create_time")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     @ApiModelProperty(value = "失效时间")
     @TableField("expire_time")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date expireTime;
 
     @ApiModelProperty(value = "进度状态")
@@ -116,7 +116,7 @@ public class OrderInfo extends BaseEntity {
 
     @ApiModelProperty(value = "可退款日期（签收后30天）")
     @TableField("refundable_time")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date refundableTime;
 
     @ApiModelProperty(value = "运费")
@@ -124,7 +124,7 @@ public class OrderInfo extends BaseEntity {
     private BigDecimal feightFee;
 
     @ApiModelProperty(value = "操作时间")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @TableField("operate_time")
     private Date operateTime;
 
@@ -140,17 +140,17 @@ public class OrderInfo extends BaseEntity {
     private CouponInfo couponInfo;
 
     // 计算总价格
-    public void sumTotalAmount(){
+    public void sumTotalAmount() {
         BigDecimal totalAmount = new BigDecimal("0");
         BigDecimal originalTotalAmount = new BigDecimal("0");
         BigDecimal couponAmount = new BigDecimal("0");
         //  减去优惠劵
-        if(null != couponInfo) {
+        if (null != couponInfo) {
             couponAmount = couponAmount.add(couponInfo.getReduceAmount());
             totalAmount = totalAmount.subtract(couponInfo.getReduceAmount());
         }
         //  减去活动
-        if(null != this.getActivityReduceAmount()) {
+        if (null != this.getActivityReduceAmount()) {
             totalAmount = totalAmount.subtract(this.getActivityReduceAmount());
         }
         //  计算最后 单价*数量 = result = totalAmount
@@ -166,6 +166,7 @@ public class OrderInfo extends BaseEntity {
 
     /**
      * 获取促销优惠总金额
+     *
      * @param orderInfo
      * @return
      */
@@ -173,20 +174,22 @@ public class OrderInfo extends BaseEntity {
         //促销优惠金额
         BigDecimal activityReduceAmount = new BigDecimal("0");
         List<OrderDetailVo> orderDetailVoList = orderInfo.getOrderDetailVoList();
-        if(!CollectionUtils.isEmpty(orderDetailVoList)) {
-            for(OrderDetailVo orderDetailVo : orderDetailVoList) {
+        if (!CollectionUtils.isEmpty(orderDetailVoList)) {
+            for (OrderDetailVo orderDetailVo : orderDetailVoList) {
                 ActivityRule activityRule = orderDetailVo.getActivityRule();
-                if(null != activityRule) {
+                if (null != activityRule) {
                     activityReduceAmount = activityReduceAmount.add(activityRule.getReduceAmount());
                 }
             }
         }
         return activityReduceAmount;
     }
+
     /**
      * 计算购物项分摊的优惠减少金额
      * 打折：按折扣分担
      * 现金：按比例分摊
+     *
      * @param orderInfo
      * @return
      */

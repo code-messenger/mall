@@ -13,19 +13,19 @@ import java.util.Date;
 @ApiModel(description = "订单状态记录")
 @TableName("order_status_log")
 public class OrderStatusLog extends BaseEntity {
-   
-   private static final long serialVersionUID = 1L;
-   
-   @ApiModelProperty(value = "orderId")
-   @TableField("order_id")
-   private Long orderId;
 
-   @ApiModelProperty(value = "orderStatus")
-   @TableField("order_status")
-   private String orderStatus;
+    private static final long serialVersionUID = 1L;
 
-   @ApiModelProperty(value = "operateTime")
-   @TableField("operate_time")
-   private Date operateTime;
+    @ApiModelProperty(value = "orderId")
+    @TableField("order_id")
+    private Long orderId;
+
+    @ApiModelProperty(value = "orderStatus")
+    @TableField("order_status")
+    private String orderStatus;
+
+    @ApiModelProperty(value = "operateTime")
+    @TableField("operate_time")
+    private Date operateTime;
 
 }

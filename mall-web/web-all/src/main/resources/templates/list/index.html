@@ -126,13 +126,13 @@
                         <li th:class="${orderMap.type == '1' ? 'active': ''}">
                             <a th:href="${urlParam}+'&order=1:'+${orderMap.sort == 'asc' ? 'desc' : 'asc'}">
                                 综合<span th:if="${orderMap.type == '1'}"
-                                          th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
+                                        th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
                             </a>
                         </li>
                         <li th:class="${orderMap.type == '2' ? 'active': ''}">
                             <a th:href="${urlParam}+'&order=2:'+${orderMap.sort == 'asc' ? 'desc' : 'asc'}">
                                 价格<span th:if="${orderMap.type == '2'}"
-                                          th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
+                                        th:text="${orderMap.sort == 'asc' ? '↑' : '↓'}"></span>
                             </a>
                         </li>
                         <li>

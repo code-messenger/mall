@@ -26,4 +26,15 @@ public class OrderFeignDegradeClient implements OrderFeignClient {
     public OrderInfo getOrderInfo(Long orderId) {
         return null;
     }
+
+    /**
+     * 提交秒杀订单
+     *
+     * @param orderInfo 订单信息
+     * @return 订单id
+     */
+    @Override
+    public Long submitOrder(OrderInfo orderInfo) {
+        return null;
+    }
 }
